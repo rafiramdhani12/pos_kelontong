@@ -27,13 +27,13 @@ class DashboardModel extends Model
         $totalProduk = (int) $this->countAll();
 
         $stokRow = $db->table('products')
-            ->selectSum('jumlah', 'total_stok')
+            ->selectSum('qty', 'total_stok')
             ->get()
             ->getRowArray();
         $totalStok = (int) ($stokRow['total_stok'] ?? 0);
 
         $nilaiRow = $db->query(
-            'SELECT COALESCE(SUM(harga * jumlah), 0) AS total_nilai FROM products'
+            'SELECT COALESCE(SUM(harga * qty), 0) AS total_nilai FROM products'
         )->getRowArray();
         $totalNilai = (float) ($nilaiRow['total_nilai'] ?? 0);
 
@@ -66,12 +66,12 @@ class DashboardModel extends Model
     /**
      * Jumlah SKU per kategori (untuk chart / tabel ringkas).
      *
-     * @return list<array{kategori:string, jumlah:int}>
+     * @return list<array{kategori:string, qty:int}>
      */
     public function getCountByCategory(): array
     {
         $rows = $this->db->table('products')
-            ->select('kategori, COUNT(*) AS jumlah')
+            ->select('kategori, COUNT(*) AS qty')
             ->groupBy('kategori')
             ->orderBy('kategori', 'ASC')
             ->get()
@@ -81,7 +81,7 @@ class DashboardModel extends Model
         foreach ($rows as $row) {
             $out[] = [
                 'kategori' => (string) ($row['kategori'] ?? ''),
-                'jumlah'   => (int) ($row['jumlah'] ?? 0),
+                'qty'   => (int) ($row['qty'] ?? 0),
             ];
         }
 
@@ -96,9 +96,9 @@ class DashboardModel extends Model
     public function getLowStockProducts(int $maxQty = 5, int $limit = 8): array
     {
         return $this->db->table('products')
-            ->where('jumlah <=', $maxQty)
-            ->where('jumlah >', 0)
-            ->orderBy('jumlah', 'ASC')
+            ->where('qty <=', $maxQty)
+            ->where('qty >', 0)
+            ->orderBy('qty', 'ASC')
             ->limit($limit)
             ->get()
             ->getResultArray();
@@ -112,7 +112,7 @@ class DashboardModel extends Model
     public function getOutOfStockProducts(int $limit = 10): array
     {
         return $this->db->table('products')
-            ->where('jumlah', 0)
+            ->where('qty', 0)
             ->orderBy('updated_at', 'DESC')
             ->limit($limit)
             ->get()

@@ -17,24 +17,26 @@ class Products extends Model {
     protected $updatedField = 'updated_at';
 
     protected $allowedFields = [
-        "kode_product",
-        "nama_product",
-        "kategori",
-        "jumlah",
-        "kondisi",
-        "status",
-        "harga",
-        "image"
+        'kode_product',
+        'nama_product',
+        'kategori',
+        'qty',
+        'kondisi',
+        'is_active',
+        'deskripsi',
+        'harga',
+        'image',
     ];
 
     protected $validationRules = [
-        'kode_product' => 'required|min_length[3]',
-        'nama_product' => 'required|min_length[3]',
-        'kategori' => 'required|in_list[gunpla,tcg,figure,tools,paints]',
-        'jumlah' => 'required|numeric',
-        'kondisi' => 'required|in_list[new,used]',
-        'status' => 'required|numeric',
-        'harga' => 'required|numeric'
+        'kode_product'  => 'required|min_length[3]',
+        'nama_product'  => 'required|min_length[3]',
+        'kategori'      => 'required|in_list[gunpla,tcg,figure,tools,paints]',
+        'qty'           => 'required|numeric',
+        'kondisi'       => 'required|in_list[new,used]',
+        'is_active'     => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1]',
+        'harga'         => 'required|numeric',
+        'deskripsi'     => 'permit_empty|max_length[65535]',
     ];
 
     public function getAllProducts() {

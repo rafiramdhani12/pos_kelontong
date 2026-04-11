@@ -1,13 +1,16 @@
 <?= $this->extend('layout/dashboard_template') ?>
-
 <?= $this->section('content') ?>
 
 <?php
 $products = $products ?? [];
-$keyword = $keyword ?? '';
+$keyword  = $keyword ?? '';
+$cart     = session()->get('cart') ?? [];
+$subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
 ?>
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- Panel kiri: daftar produk -->
     <section class="xl:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
         <div class="p-4 md:p-5 border-b border-zinc-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
@@ -24,55 +27,65 @@ $keyword = $keyword ?? '';
             </form>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="table w-full">
-                <thead>
-                    <tr class="text-zinc-500 text-[10px] uppercase tracking-wider">
-                        <th>SKU</th>
-                        <th>Produk</th>
-                        <th>Kategori</th>
-                        <th class="text-right">Stok</th>
-                        <th class="text-right">Harga</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($products === []): ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-10 text-zinc-500">Produk tidak ditemukan.</td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($products as $product): ?>
-                            <tr class="border-zinc-800">
-                                <td class="font-mono text-xs text-zinc-400"><?= esc($product['kode_product']) ?></td>
-                                <td class="font-semibold text-zinc-200"><?= esc($product['nama_product']) ?></td>
-                                <td class="text-xs uppercase text-blue-400/90"><?= esc($product['kategori']) ?></td>
-                                <td class="text-right font-bold text-zinc-300"><?= (int) $product['jumlah'] ?></td>
-                                <td class="text-right font-black text-emerald-400">
-                                    Rp <?= number_format((float) $product['harga'], 0, ',', '.') ?>
-                                </td>
-                                <td class="text-right">
-                                    <button type="button" class="btn btn-xs bg-blue-600 hover:bg-blue-500 border-0 text-white" disabled>
+        <div class="p-4 md:p-5">
+            <?php if (empty($products)): ?>
+                <p class="text-zinc-500 text-sm text-center py-10">Produk tidak ditemukan.</p>
+            <?php else: ?>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <?php foreach ($products as $product): ?>
+                        <?php $habis = (int)$product['qty'] <= 0; ?>
+                        <div class="bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden flex flex-col <?= $habis ? 'opacity-50' : '' ?>">
+                            <div class="aspect-square overflow-hidden bg-zinc-700">
+                                <?php if (!empty($product['image'])): ?>
+                                    <img
+                                        src="/assets/img/<?= esc($product['image']) ?>"
+                                        alt="<?= esc($product['nama_product']) ?>"
+                                        class="w-full h-full object-cover"
+                                    />
+                                <?php else: ?>
+                                    <div class="w-full h-full flex items-center justify-center text-zinc-500 text-xs">No image</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-3 flex flex-col gap-1 flex-1">
+                                <p class="text-[10px] uppercase tracking-wider text-blue-400"><?= esc($product['kategori']) ?></p>
+                                <p class="text-sm font-semibold text-zinc-100 leading-tight"><?= esc($product['nama_product']) ?></p>
+                                <p class="text-xs <?= $habis ? 'text-red-400' : 'text-zinc-400' ?>">
+                                    Stok: <?= (int)$product['qty'] ?><?= $habis ? ' (Habis)' : '' ?>
+                                </p>
+                                <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+                                    <span class="text-sm font-black text-emerald-400">
+                                        Rp <?= number_format((float)$product['harga'], 0, ',', '.') ?>
+                                    </span>
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs bg-blue-600 hover:bg-blue-500 border-0 text-white"
+                                        onclick="tambahItem(<?= $product['id'] ?>)"
+                                        <?= $habis ? 'disabled' : '' ?>
+                                    >
                                         + Keranjang
                                     </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
-    <aside class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 h-fit">
+    <!-- Panel kanan: keranjang -->
+    <aside class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 h-fit sticky top-4">
         <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-500 mb-2">Checkout</p>
-        <h3 class="text-lg font-black text-white">Keranjang kasir</h3>
-        <p class="text-sm text-zinc-500 mt-1">Struktur POS siap, tinggal sambungkan aksi tambah item & pembayaran.</p>
+        <h3 class="text-lg font-black text-white mb-4">Keranjang kasir</h3>
 
-        <div class="mt-6 space-y-3">
+        <!-- List item cart — diisi JS -->
+        <div id="cart-items" class="space-y-2 mb-4 max-h-64 overflow-y-auto pr-1"></div>
+
+        <!-- Total -->
+        <div class="space-y-3 border-t border-zinc-800 pt-4">
             <div class="flex items-center justify-between text-sm">
                 <span class="text-zinc-400">Subtotal</span>
-                <span class="font-bold text-zinc-200">Rp 0</span>
+                <span class="font-bold text-zinc-200" id="cart-subtotal">Rp 0</span>
             </div>
             <div class="flex items-center justify-between text-sm">
                 <span class="text-zinc-400">Diskon</span>
@@ -80,16 +93,204 @@ $keyword = $keyword ?? '';
             </div>
             <div class="border-t border-zinc-800 pt-3 flex items-center justify-between">
                 <span class="text-zinc-300 font-semibold">Total Bayar</span>
-                <span class="text-xl font-black text-emerald-400">Rp 0</span>
+                <span class="text-xl font-black text-emerald-400" id="cart-total">Rp 0</span>
             </div>
         </div>
 
-        <button type="button" class="btn w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white border-0" disabled>
+        <button
+            id="btn-bayar"
+            type="button"
+            onclick="prosesBayar()"
+            class="btn w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white border-0"
+            disabled
+        >
             Proses Pembayaran
         </button>
-        <p class="text-xs text-zinc-600 mt-3">Tahap berikutnya: aktifkan session cart + simpan transaksi.</p>
+
+        <p id="cart-msg" class="text-xs text-center mt-2 text-emerald-400 hidden"></p>
     </aside>
+
+    <!-- Struk cetak — hidden di layar, muncul saat print -->
+<div id="struk-print" style="display:none">
+    <div style="font-family: monospace; width: 300px; margin: 0 auto; padding: 16px;">
+        <div style="text-align:center; margin-bottom: 12px;">
+            <h2 style="font-size: 16px; font-weight: bold; margin: 0;">AmbaToys</h2>
+            <p style="font-size: 11px; margin: 4px 0;">Hobby Shop</p>
+            <p style="font-size: 10px; margin: 0;" id="struk-waktu"></p>
+        </div>
+        <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 8px 0; margin-bottom: 8px;">
+            <div id="struk-items" style="font-size: 12px;"></div>
+        </div>
+        <div style="font-size: 12px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span>Subtotal</span>
+                <span id="struk-subtotal"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-top:6px; border-top: 1px dashed #000; padding-top:6px;">
+                <span>TOTAL</span>
+                <span id="struk-total"></span>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:12px; font-size:10px;">
+            <p>Terima kasih sudah berbelanja!</p>
+        </div>
+    </div>
+</div>
 </div>
 
-<?= $this->endSection() ?>
+<script>
+const CSRF_NAME  = '<?= csrf_token() ?>';
+const CSRF_TOKEN = '<?= csrf_hash() ?>';
 
+// Seed dari session saat halaman load
+let cart = <?= json_encode(array_values(session()->get('cart') ?? [])) ?>;
+
+function formatRp(n) {
+    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function renderCart() {
+    const el       = document.getElementById('cart-items');
+    const btnBayar = document.getElementById('btn-bayar');
+
+    if (cart.length === 0) {
+        el.innerHTML = `
+            <div class="text-sm text-zinc-500 text-center border border-dashed border-zinc-700 rounded-lg py-6">
+                Belum ada item
+            </div>`;
+        btnBayar.disabled = true;
+    } else {
+        el.innerHTML = cart.map(item => `
+            <div class="flex items-center gap-3 bg-zinc-800 rounded-lg p-2">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-zinc-100 truncate">${item.nama}</p>
+                    <p class="text-xs text-zinc-400">${item.qty} x ${formatRp(item.harga)}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-sm font-black text-emerald-400">${formatRp(item.harga * item.qty)}</p>
+                    <button onclick="hapusItem(${item.id})" class="text-xs text-red-400 hover:text-red-300 mt-1">
+                        hapus
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        btnBayar.disabled = false;
+    }
+
+    const total = cart.reduce((s, i) => s + i.harga * i.qty, 0);
+    document.getElementById('cart-subtotal').textContent = formatRp(total);
+    document.getElementById('cart-total').textContent    = formatRp(total);
+}
+
+async function tambahItem(productId) {
+    const res  = await fetch('<?= base_url('/kasir/tambah') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `${CSRF_NAME}=${CSRF_TOKEN}&product_id=${productId}&qty=1`,
+    });
+    const data = await res.json();
+    if (data.ok) {
+        cart = data.cart;
+        renderCart();
+    } else {
+        alert(data.message ?? 'Terjadi kesalahan');
+    }
+}
+
+async function hapusItem(productId) {
+    const res  = await fetch('<?= base_url('/kasir/hapus') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `${CSRF_NAME}=${CSRF_TOKEN}&product_id=${productId}`,
+    });
+    const data = await res.json();
+    if (data.ok) {
+        cart = data.cart;
+        renderCart();
+    }
+}
+function isiStruk(total) {
+    // Waktu transaksi
+    const now = new Date();
+    document.getElementById('struk-waktu').textContent =
+        now.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' }) +
+        ' ' + now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+    // List item
+    document.getElementById('struk-items').innerHTML = cart.map(item => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="flex:1;">${item.nama}</span>
+            <span style="margin: 0 8px;">${item.qty}x</span>
+            <span>${formatRp(item.harga * item.qty)}</span>
+        </div>
+    `).join('');
+
+    // Total
+    document.getElementById('struk-subtotal').textContent = formatRp(total);
+    document.getElementById('struk-total').textContent    = formatRp(total);
+}
+
+async function prosesBayar() {
+    const btn = document.getElementById('btn-bayar');
+    btn.disabled    = true;
+    btn.textContent = 'Memproses...';
+
+    const res  = await fetch('<?= base_url('/kasir/bayar') ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `${CSRF_NAME}=${CSRF_TOKEN}`,
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+        // Isi struk pakai data cart yang masih ada
+        isiStruk(data.total);
+
+        const msg = document.getElementById('cart-msg');
+        msg.textContent = `Berhasil! Total ${formatRp(data.total)}`;
+        msg.classList.remove('hidden');
+
+        window.addEventListener('afterprint', function handler(){
+            window.removeEventListener('afterprint',handler);
+            cart = [];
+            renderCart();
+            location.reload();
+        });
+
+        window.print()
+    } else {
+        alert(data.message ?? 'Terjadi kesalahan');
+        btn.disabled    = false;
+        btn.textContent = 'Proses Pembayaran';
+    }
+}
+
+// Render cart dari session saat pertama load
+renderCart();
+</script>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    #struk-print,
+    #struk-print * {
+        visibility: visible !important;
+    }
+
+    #struk-print {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: white !important;
+        color: black !important;
+        z-index: 9999 !important;
+    }
+}
+</style>
+
+<?= $this->endSection() ?>

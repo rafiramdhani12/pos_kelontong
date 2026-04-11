@@ -37,7 +37,7 @@ $labelKategori = static function (string $k): string {
         <p class="text-2xl md:text-3xl font-black text-amber-400 tabular-nums leading-tight">
             Rp <?= number_format((float) ($stats['total_nilai_inventori'] ?? 0), 0, ',', '.') ?>
         </p>
-        <p class="text-xs text-zinc-500 mt-1">Σ (harga × jumlah)</p>
+        <p class="text-xs text-zinc-500 mt-1">Σ (harga × qty)</p>
     </div>
     <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors">
         <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 mb-2">Kondisi</p>
@@ -68,7 +68,7 @@ $labelKategori = static function (string $k): string {
                 <?php foreach ($by_category as $row): ?>
                     <li class="px-5 py-3 flex items-center justify-between gap-3">
                         <span class="text-sm font-semibold text-zinc-200"><?= esc($labelKategori($row['kategori'])) ?></span>
-                        <span class="text-sm font-black text-blue-400 tabular-nums"><?= (int) $row['jumlah'] ?></span>
+                        <span class="text-sm font-black text-blue-400 tabular-nums"><?= (int) $row['qty'] ?></span>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -103,7 +103,7 @@ $labelKategori = static function (string $k): string {
                                     <td class="font-mono text-xs text-zinc-400"><?= esc($p['kode_product'] ?? '') ?></td>
                                     <td class="font-medium text-zinc-200 max-w-[200px] truncate"><?= esc($p['nama_product'] ?? '') ?></td>
                                     <td class="text-blue-400/90 text-xs uppercase"><?= esc($p['kategori'] ?? '') ?></td>
-                                    <td class="text-right font-black text-amber-400 tabular-nums"><?= (int) ($p['jumlah'] ?? 0) ?></td>
+                                    <td class="text-right font-black text-amber-400 tabular-nums"><?= (int) ($p['qty'] ?? 0) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

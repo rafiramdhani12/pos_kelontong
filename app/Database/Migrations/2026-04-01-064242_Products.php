@@ -30,7 +30,7 @@ class Products extends Migration
                 'constraint' => ['gunpla', 'tcg', 'figure', 'tools', 'paints'],
                 'null'       => false,
             ],
-            'jumlah' => [
+            'qty' => [
                 'type'       => 'INT',
                 'null'       => true,
                 'default'    => 0,
@@ -62,10 +62,14 @@ class Products extends Migration
                 'null'       => true,
                 'default'    => null,
             ],
-            // Forge tidak selalu bisa merepresentasikan ON UPDATE CURRENT_TIMESTAMP dengan konsisten lintas driver,
-            // jadi pakai raw SQL untuk match DDL manual kamu.
-            'created_at' => new RawSql('timestamp NULL DEFAULT CURRENT_TIMESTAMP'),
-            'updated_at' => new RawSql('timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+            'created_at' => [
+                'type' => 'timestamp',
+                'constraint' => 255,
+            ],
+            'updated_at' => [
+                'type' => 'timestamp',
+                'constraint' => 255,
+            ],
         ]);
 
         $this->forge->addKey('id', true);
