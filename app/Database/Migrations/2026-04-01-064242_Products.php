@@ -27,23 +27,13 @@ class Products extends Migration
             ],
             'kategori' => [
                 'type'       => 'ENUM',
-                'constraint' => ['gunpla', 'tcg', 'figure', 'tools', 'paints'],
+                'constraint' => ['makanan ringan', 'minuman', 'kebutuhan pokok', 'kebersihan', 'lainnya'],
                 'null'       => false,
             ],
             'qty' => [
                 'type'       => 'INT',
                 'null'       => true,
                 'default'    => 0,
-            ],
-            'kondisi' => [
-                'type'       => 'ENUM',
-                'constraint' => ['new', 'used'],
-                'null'       => true,
-                'default'    => 'new',
-            ],
-            'deskripsi' => [
-                'type' => 'TEXT',
-                'null' => true,
             ],
             'is_active' => [
                 'type'       => 'TINYINT',
@@ -64,11 +54,6 @@ class Products extends Migration
             ],
             'created_at' => [
                 'type' => 'timestamp',
-                'constraint' => 255,
-            ],
-            'updated_at' => [
-                'type' => 'timestamp',
-                'constraint' => 255,
             ],
         ]);
 

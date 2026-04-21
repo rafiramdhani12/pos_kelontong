@@ -13,7 +13,7 @@
         <div class="w-full max-w-md">
             <div class="mb-6 text-center">
                 <a href="<?= base_url('/') ?>" class="inline-flex items-baseline gap-1 text-white font-black tracking-tighter text-2xl">
-                    AMBATOYS<span class="text-blue-600">.</span>
+                    Kelontong Arya<span class="text-blue-600">.</span>
                 </a>
                 <p class="mt-2 text-zinc-500 text-sm">
                     Panel POS / Admin
@@ -23,7 +23,7 @@
             <?= $this->renderSection('content') ?>
 
             <p class="mt-8 text-center text-xs text-zinc-600">
-                &copy; 2026 AmbaToys. Login untuk akses POS.
+                &copy; 2026 Kelontong Arya. Login untuk akses POS.
             </p>
         </div>
     </div>

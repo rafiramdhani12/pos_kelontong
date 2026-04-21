@@ -21,9 +21,7 @@ class Products extends Model {
         'nama_product',
         'kategori',
         'qty',
-        'kondisi',
         'is_active',
-        'deskripsi',
         'harga',
         'image',
     ];
@@ -31,12 +29,10 @@ class Products extends Model {
     protected $validationRules = [
         'kode_product'  => 'required|min_length[3]',
         'nama_product'  => 'required|min_length[3]',
-        'kategori'      => 'required|in_list[gunpla,tcg,figure,tools,paints]',
-        'qty'           => 'required|numeric',
-        'kondisi'       => 'required|in_list[new,used]',
+        'kategori'      => 'required|in_list[makanan ringan, minuman, kebutuhan pokok, kebersihan, lainnya]',
+        'qty'           => 'required|numeric|greater_than_equal_to[0]',
         'is_active'     => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[1]',
         'harga'         => 'required|numeric',
-        'deskripsi'     => 'permit_empty|max_length[65535]',
     ];
 
     public function getAllProducts() {

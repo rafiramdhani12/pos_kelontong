@@ -15,7 +15,7 @@ class Auth extends BaseController
 
         if (! $this->request->is('post')) {
             return view('auth/login', [
-                'title'        => 'Login POS — AmbaToys',
+                'title'        => 'Login POS kelontong Arya',
                 'page_heading' => 'Login',
             ]);
         }

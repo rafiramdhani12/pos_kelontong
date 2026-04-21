@@ -18,6 +18,10 @@ class Transaksi extends Migration
                 "type" => "INT",
                 "null" => false
             ],
+            "user_id" => [
+                "type" => "INT",
+                "null" => false
+            ],
             "created_at" => [
                 "type" => "TIMESTAMP",
                 "null" => false
@@ -29,6 +33,9 @@ class Transaksi extends Migration
         ]);
 
         $this->forge->addKey('id', true);
+
+        $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
+
         $this->forge->createTable('transaksi');
     }
 

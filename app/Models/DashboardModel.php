@@ -37,29 +37,29 @@ class DashboardModel extends Model
         )->getRowArray();
         $totalNilai = (float) ($nilaiRow['total_nilai'] ?? 0);
 
-        $kondisi = $db->table('products')
-            ->select('kondisi, COUNT(*) AS c')
-            ->groupBy('kondisi')
-            ->get()
-            ->getResultArray();
+        // $kondisi = $db->table('products')
+        //     ->select('kondisi, COUNT(*) AS c')
+        //     ->groupBy('kondisi')
+        //     ->get()
+        //     ->getResultArray();
 
-        $baru = 0;
-        $bekas = 0;
-        foreach ($kondisi as $row) {
-            if (($row['kondisi'] ?? '') === 'new') {
-                $baru = (int) $row['c'];
-            }
-            if (($row['kondisi'] ?? '') === 'used') {
-                $bekas = (int) $row['c'];
-            }
-        }
+        // $baru = 0;
+        // $bekas = 0;
+        // foreach ($kondisi as $row) {
+        //     if (($row['kondisi'] ?? '') === 'new') {
+        //         $baru = (int) $row['c'];
+        //     }
+        //     if (($row['kondisi'] ?? '') === 'used') {
+        //         $bekas = (int) $row['c'];
+        //     }
+        // }
 
         return [
             'total_produk'           => $totalProduk,
             'total_stok'             => $totalStok,
             'total_nilai_inventori' => $totalNilai,
-            'produk_baru'            => $baru,
-            'produk_bekas'           => $bekas,
+            // 'produk_baru'            => $baru,
+            // 'produk_bekas'           => $bekas,
         ];
     }
 

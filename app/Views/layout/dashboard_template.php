@@ -33,6 +33,13 @@
                     </svg>
                     Dashboard
                 </a>
+                <a href="<?= base_url('penjualan') ?>"
+                   class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold <?= $currentPath === 'dashboard' ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    </svg>
+                    Penjualan
+                </a>
                 <span class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-500 cursor-not-allowed border border-transparent" title="Master data">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />

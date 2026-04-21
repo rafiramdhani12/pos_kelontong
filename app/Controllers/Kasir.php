@@ -38,6 +38,54 @@ class Kasir extends BaseController
         ]);
     }
 
+    public function penjualan(){
+        $transaksiModel = new Transaksi();
+        $detailTransaksiModel = new DetailTransaksi();
+        $productsModel = new Products();
+
+        // ambil dulu semua transaksi nya
+        $transaksi = $transaksiModel->select('id , total , created_at')->findAll();
+
+        // attach item ke setiap transaksi
+        foreach ($transaksi as &$t){
+            $t['items'] = $detailTransaksiModel->where('transaksi_id' , $t['id'])->findAll();
+        }
+
+        // ambil semua produk
+        $products =  $productsModel->select('id , nama_product , kategori , harga , qty')->findAll();
+
+        return $this->response->setJSON(
+            [
+                'transaction' => $transaksi,
+                'products' => $products
+            ]
+        );
+
+    }
+
+    public function laporan_penjualan()
+{
+    $transaksiModel = new Transaksi();
+    $detailTransaksiModel = new DetailTransaksi();
+
+    // Ambil data transaksi
+    $transaksi = $transaksiModel->select('id, total, created_at')->orderBy('created_at', 'DESC')->findAll();
+
+    // Attach detail item (pake cara lu yang tadi biar simpel)
+    foreach ($transaksi as &$t) {
+        $t['items'] = $detailTransaksiModel
+            ->select('detail_transaksi.*, products.nama_product') // Join biar muncul nama produknya, bukan cuma ID
+            ->join('products', 'products.id = detail_transaksi.product_id')
+            ->where('transaksi_id', $t['id'])
+            ->findAll();
+    }
+
+    return view('pages/penjualan', [
+        'title'       => 'Laporan Penjualan — AmbaToys',
+        'transaction' => $transaksi
+    ]);
+}
+
     public function tambah(): ResponseInterface
     {
         $id = (int) $this->request->getPost('product_id');
@@ -108,7 +156,10 @@ class Kasir extends BaseController
 
         $db->transStart();
 
-        $transaksiId = $transaksiModel->insert(['total' => $totalInt]);
+        $transaksiId = $transaksiModel->insert([
+            'total' => $totalInt,
+            'user_id' => session()->get('user_id')
+            ]);
         if ($transaksiId === false) {
             $db->transRollback();
 

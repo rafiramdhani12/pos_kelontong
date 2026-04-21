@@ -14,7 +14,7 @@ class Transaksi extends Model
  protected $createdField = 'created_at';
  protected $updatedField = 'updated_at';
 
- protected $allowedFields = ['total'];
+ protected $allowedFields = ['total' , 'user_id'];
 }
 
 
