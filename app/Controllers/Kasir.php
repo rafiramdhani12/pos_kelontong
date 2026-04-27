@@ -38,38 +38,68 @@ class Kasir extends BaseController
         ]);
     }
 
-    public function penjualan(){
-        $transaksiModel = new Transaksi();
-        $detailTransaksiModel = new DetailTransaksi();
-        $productsModel = new Products();
+  public function penjualan(){
+    $transaksiModel = new Transaksi();
+    $detailTransaksiModel = new DetailTransaksi();
+    $productsModel = new Products();
 
-        // ambil dulu semua transaksi nya
-        $transaksi = $transaksiModel->select('id , total , created_at')->findAll();
+    $transaksi = $transaksiModel->select('id, total, created_at')->findAll();
 
-        // attach item ke setiap transaksi
-        foreach ($transaksi as &$t){
-            $t['items'] = $detailTransaksiModel->where('transaksi_id' , $t['id'])->findAll();
+    // Flatten semua items sekalian
+    $allItems = [];
+    foreach ($transaksi as &$t){
+        $items = $detailTransaksiModel->where('transaksi_id', $t['id'])->findAll();
+        $t['items'] = $items;
+        foreach ($items as $item) {
+            $allItems[] = $item;
         }
-
-        // ambil semua produk
-        $products =  $productsModel->select('id , nama_product , kategori , harga , qty')->findAll();
-
-        return $this->response->setJSON(
-            [
-                'transaction' => $transaksi,
-                'products' => $products
-            ]
-        );
-
     }
+
+    $products = $productsModel->select('id, nama_product, kategori, harga, qty')->findAll();
+
+    return $this->response->setJSON([
+        'transaction' => $transaksi,
+        'items'       => $allItems,  // ← flat array semua detail
+        'products'    => $products
+    ]);
+}
 
     public function laporan_penjualan()
 {
     $transaksiModel = new Transaksi();
     $detailTransaksiModel = new DetailTransaksi();
+    $filterType = (string) ($this->request->getGet('filter') ?? 'harian');
+    $allowedFilters = ['harian', 'mingguan', 'bulanan'];
+    if (!in_array($filterType, $allowedFilters, true)) {
+        $filterType = 'harian';
+    }
+
+    $tanggal = trim((string) ($this->request->getGet('tanggal') ?? ''));
+    $minggu = trim((string) ($this->request->getGet('minggu') ?? ''));
+    $bulan = trim((string) ($this->request->getGet('bulan') ?? ''));
+
+    $builder = $transaksiModel->select('id, total, created_at');
+
+    if ($filterType === 'harian' && $tanggal !== '') {
+        $builder->where('DATE(created_at)', $tanggal);
+    } elseif ($filterType === 'mingguan' && $minggu !== '') {
+        $startDate = null;
+        if (preg_match('/^(\d{4})-W(\d{2})$/', $minggu, $match) === 1) {
+            $isoYear = (int) $match[1];
+            $isoWeek = (int) $match[2];
+            $weekStart = new \DateTime();
+            $weekStart->setISODate($isoYear, $isoWeek);
+            $startDate = $weekStart->format('Y-m-d');
+            $weekStart->modify('+6 days');
+            $endDate = $weekStart->format('Y-m-d');
+            $builder->where('DATE(created_at) >=', $startDate)->where('DATE(created_at) <=', $endDate);
+        }
+    } elseif ($filterType === 'bulanan' && $bulan !== '') {
+        $builder->where("DATE_FORMAT(created_at, '%Y-%m') =", $bulan);
+    }
 
     // Ambil data transaksi
-    $transaksi = $transaksiModel->select('id, total, created_at')->orderBy('created_at', 'DESC')->findAll();
+    $transaksi = $builder->orderBy('created_at', 'DESC')->findAll();
 
     // Attach detail item (pake cara lu yang tadi biar simpel)
     foreach ($transaksi as &$t) {
@@ -82,7 +112,11 @@ class Kasir extends BaseController
 
     return view('pages/penjualan', [
         'title'       => 'Laporan Penjualan — AmbaToys',
-        'transaction' => $transaksi
+        'transaction' => $transaksi,
+        'filter_type' => $filterType,
+        'tanggal'     => $tanggal,
+        'minggu'      => $minggu,
+        'bulan'       => $bulan,
     ]);
 }
 
@@ -220,6 +254,56 @@ class Kasir extends BaseController
             'message' => 'Transaksi berhasil',
             'total'   => $totalInt,
         ]);
+    }
+
+    public function getDataFromFlask(){
+        try {
+            $transaksiModel = new Transaksi();
+            $detailTransaksiModel = new DetailTransaksi();
+            $productsModel = new Products();
+            $transactions = $transaksiModel->select('id, total, created_at')->findAll();
+            $items = $detailTransaksiModel->select('transaksi_id, product_id, qty, subtotal')->findAll();
+            $products = $productsModel
+                ->select('id, kode_product, nama_product, kategori, qty, harga, is_active')
+                ->where('is_active', 1)
+                ->findAll();
+
+            $client = \Config\Services::curlrequest();
+            $res = $client->post('http://127.0.0.1:5000/forecast',[
+                'timeout' => 10,
+                'http_errors' => false,
+                'json' => [
+                    'transaction' => $transactions,
+                    'items' => $items,
+                    'products' => $products,
+                ],
+            ]);
+
+            $statusCode = $res->getStatusCode();
+            $payload = json_decode($res->getBody(), true);
+
+            if (!is_array($payload)) {
+                return $this->response->setStatusCode(502)->setJSON([
+                    'status' => 'error',
+                    'message' => 'Respons AI service tidak valid',
+                ]);
+            }
+
+            if (($payload['status'] ?? null) !== 'success') {
+                return $this->response->setStatusCode($statusCode >= 400 ? $statusCode : 502)->setJSON([
+                    'status' => 'error',
+                    'message' => $payload['message'] ?? 'AI service mengembalikan error',
+                    'flask_http_code' => $statusCode,
+                ]);
+            }
+
+            return $this->response->setStatusCode(200)->setJSON($payload);
+        } catch (\Exception $e) {
+            return $this->response->setStatusCode(503)->setJSON([
+                "status" => "error",
+                "message" => "AI service offline",
+            ]);
+        }
     }
 }
 

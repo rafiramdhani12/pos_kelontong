@@ -118,4 +118,13 @@ class DashboardModel extends Model
             ->get()
             ->getResultArray();
     }
+ public function getDailyOmzet(): float
+{
+    $row = $this->db->table('transaksi')
+              ->selectSum('total', 'omzet')
+              ->get()
+              ->getRowArray();
+
+    return (float) ($row['omzet'] ?? 0);
+}
 }

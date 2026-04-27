@@ -6,6 +6,7 @@ $products = $products ?? [];
 $keyword  = $keyword ?? '';
 $cart     = session()->get('cart') ?? [];
 $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
+$payment = 0;
 ?>
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -56,10 +57,10 @@ $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
                                     <span class="text-sm font-black text-emerald-400">
                                         Rp <?= number_format((float)$product['harga'], 0, ',', '.') ?>
                                     </span>
-                                    <button
+                                   <button
                                         type="button"
                                         class="btn btn-xs bg-blue-600 hover:bg-blue-500 border-0 text-white"
-                                        onclick="tambahItem(<?= $product['id'] ?>)"
+                                        onclick="inputJumlah(<?= $product['id'] ?>, '<?= esc($product['nama_product']) ?>', <?= (int)$product['qty'] ?>)"
                                         <?= $habis ? 'disabled' : '' ?>
                                     >
                                         + Keranjang
@@ -81,6 +82,11 @@ $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
         <!-- List item cart — diisi JS -->
         <div id="cart-items" class="space-y-2 mb-4 max-h-64 overflow-y-auto pr-1"></div>
 
+        <div class="flex justify-between text-white">
+            <span class="text-xs text-zinc-400">Pembayaran</span>
+            <input type="number" name="payment" id="payment" placeholder="Rp0" oninput="kembalian()" >
+        </div>
+        
         <!-- Total -->
         <div class="space-y-3 border-t border-zinc-800 pt-4">
             <div class="flex items-center justify-between text-sm">
@@ -88,12 +94,16 @@ $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
                 <span class="font-bold text-zinc-200" id="cart-subtotal">Rp 0</span>
             </div>
             <div class="flex items-center justify-between text-sm">
-                <span class="text-zinc-400">Diskon</span>
-                <span class="font-bold text-zinc-200">Rp 0</span>
-            </div>
+            <span class="text-zinc-400">Pembayaran</span>
+            <span class="font-bold text-zinc-200" id="cart-pembayaran">Rp 0</span>
+        </div>
             <div class="border-t border-zinc-800 pt-3 flex items-center justify-between">
                 <span class="text-zinc-300 font-semibold">Total Bayar</span>
                 <span class="text-xl font-black text-emerald-400" id="cart-total">Rp 0</span>
+            </div>
+            <div class="border-t border-zinc-800 pt-3 flex items-center justify-between">
+                <span class="text-zinc-300 font-semibold">kembalian</span>
+                <span class="text-xl font-black text-emerald-400" id="cart-kembalian">Rp 0</span>
             </div>
         </div>
 
@@ -114,8 +124,8 @@ $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
 <div id="struk-print" style="display:none">
     <div style="font-family: monospace; width: 300px; margin: 0 auto; padding: 16px;">
         <div style="text-align:center; margin-bottom: 12px;">
-            <h2 style="font-size: 16px; font-weight: bold; margin: 0;">AmbaToys</h2>
-            <p style="font-size: 11px; margin: 4px 0;">Hobby Shop</p>
+            <h2 style="font-size: 16px; font-weight: bold; margin: 0;">toko arya</h2>
+            <p style="font-size: 11px; margin: 4px 0;">toko arya</p>
             <p style="font-size: 10px; margin: 0;" id="struk-waktu"></p>
         </div>
         <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 8px 0; margin-bottom: 8px;">
@@ -129,6 +139,14 @@ $subtotal = array_sum(array_map(fn($i) => $i['harga'] * $i['qty'], $cart));
             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-top:6px; border-top: 1px dashed #000; padding-top:6px;">
                 <span>TOTAL</span>
                 <span id="struk-total"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-top:6px; border-top: 1px dashed #000; padding-top:6px;">
+                <span>PAYMENT</span>
+                <span id="struk-payment"></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-top:6px; border-top: 1px dashed #000; padding-top:6px;">
+                <span>KEMBALIAN</span>
+                <span id="struk-kembalian"></span>
             </div>
         </div>
         <div style="text-align:center; margin-top:12px; font-size:10px;">
@@ -147,6 +165,23 @@ let cart = <?= json_encode(array_values(session()->get('cart') ?? [])) ?>;
 
 function formatRp(n) {
     return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+function kembalian(){
+    const subtotal = cart.reduce((total, item) => total + item.harga * item.qty, 0);
+    const payment = parseInt(document.getElementById('payment').value);
+    const kembalian   = payment - subtotal;
+    document.getElementById('cart-pembayaran').textContent = formatRp(payment ? payment : 0);
+    document.getElementById('cart-kembalian').textContent = formatRp(kembalian >= 0 ? kembalian : 0)
+    
+    // validate
+    const btnBayar = document.getElementById('btn-bayar');
+    if(cart.length > 0 && payment >= subtotal){
+        btnBayar.disabled = false;
+    } else {
+        btnBayar.disabled = true;
+    }
+
 }
 
 function renderCart() {
@@ -177,17 +212,44 @@ function renderCart() {
         btnBayar.disabled = false;
     }
 
-    const total = cart.reduce((s, i) => s + i.harga * i.qty, 0);
-    document.getElementById('cart-subtotal').textContent = formatRp(total);
-    document.getElementById('cart-total').textContent    = formatRp(total);
+    const subtotal = cart.reduce((s, i) => s + i.harga * i.qty, 0);
+    document.getElementById('cart-subtotal').textContent = formatRp(subtotal);
+    document.getElementById('cart-total').textContent    = formatRp(subtotal);
+
+    kembalian();
 }
 
-async function tambahItem(productId) {
-    const res  = await fetch('<?= base_url('/kasir/tambah') ?>', {
+function inputJumlah(productId, namaProduct, stokTersedia) {
+    const qty = window.prompt(`Masukkan jumlah untuk "${namaProduct}" (Stok: ${stokTersedia}):`, "1");
+    
+    // Validasi kalau user klik cancel atau input kosong
+    if (qty === null || qty === "") return;
+
+    const jumlah = parseInt(qty);
+
+    // Validasi angka
+    if (isNaN(jumlah) || jumlah <= 0) {
+        alert("Masukkan jumlah yang valid (angka minimal 1)");
+        return;
+    }
+
+    if (jumlah > stokTersedia) {
+        alert(`Stok tidak mencukupi! Maksimal pembelian: ${stokTersedia}`);
+        return;
+    }
+
+    // Kalau lolos validasi, panggil fungsi fetch
+    tambahItem(productId, jumlah);
+}
+
+async function tambahItem(productId, qty) {
+    const res = await fetch('<?= base_url('/kasir/tambah') ?>', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `${CSRF_NAME}=${CSRF_TOKEN}&product_id=${productId}&qty=1`,
+        // Perhatikan bagian &qty=${qty} di bawah ini
+        body: `${CSRF_NAME}=${CSRF_TOKEN}&product_id=${productId}&qty=${qty}`,
     });
+    
     const data = await res.json();
     if (data.ok) {
         cart = data.cart;
@@ -196,7 +258,6 @@ async function tambahItem(productId) {
         alert(data.message ?? 'Terjadi kesalahan');
     }
 }
-
 async function hapusItem(productId) {
     const res  = await fetch('<?= base_url('/kasir/hapus') ?>', {
         method: 'POST',
@@ -228,6 +289,8 @@ function isiStruk(total) {
     // Total
     document.getElementById('struk-subtotal').textContent = formatRp(total);
     document.getElementById('struk-total').textContent    = formatRp(total);
+    document.getElementById('struk-payment').textContent    = formatRp(parseInt(document.getElementById('payment').value));
+    document.getElementById('struk-kembalian').textContent    = formatRp(parseInt(document.getElementById('payment').value) - total);
 }
 
 async function prosesBayar() {

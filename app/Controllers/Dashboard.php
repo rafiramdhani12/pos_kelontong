@@ -14,6 +14,7 @@ class Dashboard extends BaseController
             'title'           => 'Dashboard — AmbaToys',
             'page_heading'    => 'Ringkasan toko',
             'stats'           => $dashboardModel->getOverviewStats(),
+            'daily_omzet'     => $dashboardModel->getDailyOmzet(),
             'by_category'     => $dashboardModel->getCountByCategory(),
             'low_stock'       => $dashboardModel->getLowStockProducts(5, 8),
             'out_of_stock'    => $dashboardModel->getOutOfStockProducts(6),

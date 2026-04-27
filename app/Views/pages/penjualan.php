@@ -1,6 +1,12 @@
 <?= $this->extend('layout/dashboard_template'); ?>
 
 <?= $this->section('content'); ?>
+<?php
+$filterType = $filter_type ?? 'harian';
+$tanggal = $tanggal ?? '';
+$minggu = $minggu ?? '';
+$bulan = $bulan ?? '';
+?>
 <div class="p-6 bg-zinc-900 min-h-screen text-white">
     <div class="flex justify-between items-center mb-6">
         <div>
@@ -9,6 +15,39 @@
         </div>
         <button class="btn btn-outline btn-primary btn-sm">Download PDF (coming soon)</button>
     </div>
+
+    <form method="get" action="<?= base_url('/penjualan') ?>" class="mb-6 bg-zinc-800 rounded-xl border border-zinc-700 p-4">
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+            <div class="md:col-span-2">
+                <label class="text-xs uppercase tracking-wider text-zinc-400 font-bold">Jenis Filter</label>
+                <select name="filter" id="filter_type" class="select select-bordered w-full bg-zinc-900 border-zinc-700 mt-1">
+                    <option value="harian" <?= $filterType === 'harian' ? 'selected' : '' ?>>Harian (per tanggal)</option>
+                    <option value="mingguan" <?= $filterType === 'mingguan' ? 'selected' : '' ?>>Mingguan</option>
+                    <option value="bulanan" <?= $filterType === 'bulanan' ? 'selected' : '' ?>>Bulanan</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2 filter-input" data-type="harian" <?= $filterType === 'harian' ? '' : 'style="display:none;"' ?>>
+                <label class="text-xs uppercase tracking-wider text-zinc-400 font-bold">Tanggal</label>
+                <input type="date" name="tanggal" value="<?= esc($tanggal) ?>" class="input input-bordered w-full bg-zinc-900 border-zinc-700 mt-1">
+            </div>
+
+            <div class="md:col-span-2 filter-input" data-type="mingguan" <?= $filterType === 'mingguan' ? '' : 'style="display:none;"' ?>>
+                <label class="text-xs uppercase tracking-wider text-zinc-400 font-bold">Minggu</label>
+                <input type="week" name="minggu" value="<?= esc($minggu) ?>" class="input input-bordered w-full bg-zinc-900 border-zinc-700 mt-1">
+            </div>
+
+            <div class="md:col-span-2 filter-input" data-type="bulanan" <?= $filterType === 'bulanan' ? '' : 'style="display:none;"' ?>>
+                <label class="text-xs uppercase tracking-wider text-zinc-400 font-bold">Bulan</label>
+                <input type="month" name="bulan" value="<?= esc($bulan) ?>" class="input input-bordered w-full bg-zinc-900 border-zinc-700 mt-1">
+            </div>
+
+            <div class="md:col-span-2 flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Terapkan</button>
+                <a href="<?= base_url('/penjualan') ?>" class="btn btn-ghost btn-sm">Reset</a>
+            </div>
+        </div>
+    </form>
 
     <div class="bg-zinc-800 rounded-xl shadow-2xl border border-zinc-700">
         <div class="overflow-x-auto">
@@ -22,18 +61,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($transaction as $t): ?>
-                    <tr class="hover:bg-zinc-700/30 border-b border-zinc-700/50">
-                        <td class="font-mono text-sm text-primary font-semibold">#TX-<?= $t['id'] ?></td>
-                        <td class="text-gray-300"><?= date('d M Y, H:i', strtotime($t['created_at'])) ?></td>
-                        <td class="font-bold text-success text-lg">Rp <?= number_format($t['total'], 0, ',', '.') ?></td>
-                        <td class="text-center">
-                            <button onclick="document.getElementById('modal_detail_<?= $t['id'] ?>').showModal()" class="btn btn-ghost btn-sm text-info hover:bg-info/10">
-                                Detail
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                    <?php if ($transaction === []): ?>
+                        <tr>
+                            <td colspan="4" class="text-center py-10 text-gray-400 italic">Tidak ada transaksi untuk filter yang dipilih.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($transaction as $t): ?>
+                        <tr class="hover:bg-zinc-700/30 border-b border-zinc-700/50">
+                            <td class="font-mono text-sm text-primary font-semibold">#TX-<?= $t['id'] ?></td>
+                            <td class="text-gray-300"><?= date('d M Y, H:i', strtotime($t['created_at'])) ?></td>
+                            <td class="font-bold text-success text-lg">Rp <?= number_format($t['total'], 0, ',', '.') ?></td>
+                            <td class="text-center">
+                                <button onclick="document.getElementById('modal_detail_<?= $t['id'] ?>').showModal()" class="btn btn-ghost btn-sm text-info hover:bg-info/10">
+                                    Detail
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -95,5 +140,22 @@
     </form>
 </dialog>
 <?php endforeach; ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterSelect = document.getElementById('filter_type');
+        const filterInputs = document.querySelectorAll('.filter-input');
+
+        const toggleInputs = () => {
+            const selected = filterSelect.value;
+            filterInputs.forEach((el) => {
+                el.style.display = el.dataset.type === selected ? '' : 'none';
+            });
+        };
+
+        filterSelect.addEventListener('change', toggleInputs);
+        toggleInputs();
+    });
+</script>
 
 <?= $this->endSection(); ?>

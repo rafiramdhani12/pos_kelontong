@@ -1,3 +1,36 @@
+<?php $currentPath = trim(service('uri')->getPath(), '/'); ?>
+
+<?php
+$menus = [
+    [
+        'label' => 'Kasir',
+        'd' => 'M3 7h18M3 12h18m-7 5h7',
+        'link' => base_url('/kasir'),
+        'active' => $currentPath === 'kasir'
+    ],
+    [
+        'label' => 'Dashboard',
+        'd' => 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+        'link' => base_url('/dashboard'),
+        'active' => $currentPath === 'dashboard'
+    ],
+    [
+        'label' => 'Penjualan',
+        'd' => 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25',
+        'link' => base_url('/penjualan'),
+        'active' => $currentPath === 'penjualan'
+    ],
+    [
+        'label' => 'Barang (Master)',
+        'xmlns' => 'http://www.w3.org/2000/svg',
+        'd' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+        'link' => base_url('/barang'),
+        'active' => 'barang'
+    ]
+]
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,44 +41,33 @@
     <title><?= esc($title ?? 'Dashboard — AmbaToys') ?></title>
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col md:flex-row">
-    <?php $currentPath = trim(service('uri')->getPath(), '/'); ?>
 
     <!-- Sidebar -->
     <aside class="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-zinc-800 bg-zinc-950/95 md:min-h-screen md:sticky md:top-0 md:self-start">
         <div class="p-4 md:p-6 flex flex-col gap-6">
             <a href="<?= base_url('/') ?>" class="text-xl font-black tracking-tighter text-white">
-                AMBATOYS<span class="text-blue-600">.</span>
+                POS SYSTEM<span class="text-blue-600">.</span>
             </a>
             <span class="text-[10px] font-bold uppercase tracking-[0.35em] text-blue-500/90">Admin</span>
 
             <nav class="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-1 px-1">
-                <a href="<?= base_url('kasir') ?>"
-                   class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold <?= $currentPath === 'kasir' ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
+                <?php foreach ($menus as $menu) : ?>
+
+                    <?php
+                        $isOwnerMenu = ($menu['label'] === 'Barang (Master)') ;
+                        $isNotOwner = (session()->get('user_role') !== 'owner') ;
+                        if($isOwnerMenu && $isNotOwner) continue;
+                    ?>
+
+                <a href="<?= $menu['link'] ?>"
+                  class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold 
+   <?= ($currentPath === "kasir") ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18m-7 5h7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="<?= $menu['d'] ?>" />
                     </svg>
-                    Kasir
+                    <?= $menu['label'] ?>
                 </a>
-                <a href="<?= base_url('dashboard') ?>"
-                   class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold <?= $currentPath === 'dashboard' ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="<?= base_url('penjualan') ?>"
-                   class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold <?= $currentPath === 'dashboard' ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                    </svg>
-                    Penjualan
-                </a>
-                <span class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-500 cursor-not-allowed border border-transparent" title="Master data">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                    Produk (master)
-                </span>
+                <?php endforeach?>
             </nav>
 
             <a href="<?= base_url('/logout') ?>" class="hidden md:flex items-center gap-2 text-sm text-zinc-400 hover:text-blue-400 transition-colors mt-auto pt-4 border-t border-zinc-800">
