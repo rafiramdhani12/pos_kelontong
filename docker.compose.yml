@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  app:
+    image: bitnami/php-fpm:8.3
+    volumes:
+      - .:/app
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: Karab412
+      MYSQL_DATABASE: db_pos
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf

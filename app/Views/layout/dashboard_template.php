@@ -103,6 +103,6 @@ $menus = [
             <p class="text-zinc-600 text-xs">&copy; 2026 AmbaToys Admin. Hobby shop dashboard.</p>
         </footer>
     </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

@@ -19,3 +19,4 @@ $routes->group('dashboard' ,static function ($routes){
     $routes->get('get-ai-data', 'Kasir::getDataFromFlask');
 });
 $routes->get('/barang', 'Barang::index', ['filter' => 'auth']);
+$routes->get('/barang/tambahProduct', 'Barang::tambahProduct', ['filter' => 'auth']);

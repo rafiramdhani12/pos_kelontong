@@ -68,7 +68,7 @@ $bulan = $bulan ?? '';
                     <?php else: ?>
                         <?php foreach ($transaction as $t): ?>
                         <tr class="hover:bg-zinc-700/30 border-b border-zinc-700/50">
-                            <td class="font-mono text-sm text-primary font-semibold">#TX-<?= $t['id'] ?></td>
+                            <td class="font-mono text-sm text-emerald-400 font-semibold">#TX-<?= $t['id'] ?></td>
                             <td class="text-gray-300"><?= date('d M Y, H:i', strtotime($t['created_at'])) ?></td>
                             <td class="font-bold text-success text-lg">Rp <?= number_format($t['total'], 0, ',', '.') ?></td>
                             <td class="text-center">

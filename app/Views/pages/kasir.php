@@ -219,26 +219,32 @@ function renderCart() {
     kembalian();
 }
 
-function inputJumlah(productId, namaProduct, stokTersedia) {
-    const qty = window.prompt(`Masukkan jumlah untuk "${namaProduct}" (Stok: ${stokTersedia}):`, "1");
+async function inputJumlah(productId, namaProduct, stokTersedia) {
+    const qty = await Swal.fire({
+        title: `Masukkan jumlah untuk "${namaProduct}" (Stok: ${stokTersedia}):`,
+        input:"number",
+        showCancelButton: true,
+        confirmButtonText: "Tambah",
+        cancelButtonText: "Batal",
+        inputValue:1,
+        inputAttributes: {
+            min:1,
+            max:stokTersedia,
+            step:1
+        },
+        showLoaderOnConfirm: true,
+        inputValidator: (value) => {
+            if(!value || value <= 0) return 'Masukkan jumlah yang valid (angka minimal 1)';
+            if(parseInt(value) > stokTersedia) return `Stok tidak mencukupi! Maksimal pembelian: ${stokTersedia}`
+        }
+    })
+    // const qty = window.prompt(`Masukkan jumlah untuk "${namaProduct}" (Stok: ${stokTersedia}):`, "1");
     
     // Validasi kalau user klik cancel atau input kosong
-    if (qty === null || qty === "") return;
+    if (qty.isDismissed || !qty.value) return;
+
 
     const jumlah = parseInt(qty);
-
-    // Validasi angka
-    if (isNaN(jumlah) || jumlah <= 0) {
-        alert("Masukkan jumlah yang valid (angka minimal 1)");
-        return;
-    }
-
-    if (jumlah > stokTersedia) {
-        alert(`Stok tidak mencukupi! Maksimal pembelian: ${stokTersedia}`);
-        return;
-    }
-
-    // Kalau lolos validasi, panggil fungsi fetch
     tambahItem(productId, jumlah);
 }
 
