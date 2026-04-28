@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   app:
-    image: bitnami/php-fpm:8.3
+    image: php-fpm:8.3
     volumes:
       - .:/app
   db:
