@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   app:
-    image: php-fpm:8.3
+    image: php:8.3-fpm
     volumes:
       - .:/app
   db:
