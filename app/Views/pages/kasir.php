@@ -244,7 +244,7 @@ async function inputJumlah(productId, namaProduct, stokTersedia) {
     if (qty.isDismissed || !qty.value) return;
 
 
-    const jumlah = parseInt(qty);
+    const jumlah = parseInt(qty.value);
     tambahItem(productId, jumlah);
 }
 

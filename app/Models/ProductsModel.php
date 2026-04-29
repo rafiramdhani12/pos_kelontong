@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Products extends Model {
+class ProductsModel extends Model {
 
     // init nama tabel nya dulu
     protected $table = 'products';

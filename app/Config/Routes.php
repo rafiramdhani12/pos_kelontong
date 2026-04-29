@@ -18,5 +18,13 @@ $routes->group('dashboard' ,static function ($routes){
     $routes->get('/', 'Dashboard::index');
     $routes->get('get-ai-data', 'Kasir::getDataFromFlask');
 });
-$routes->get('/barang', 'Barang::index', ['filter' => 'auth']);
-$routes->get('/barang/tambahProduct', 'Barang::tambahProduct', ['filter' => 'auth']);
+$routes->get('/products', 'Products::index', ['filter' => 'auth']);
+$routes->post('/products/tambahProduct', 'Products::tambahProduct', ['filter' => 'auth']);
+$routes->group('users', static function ($routes) {
+    $routes->get('/' , 'Users::index');
+    $routes->get('add' , 'Users::add');
+    $routes->post('store' , 'Users::store');
+    $routes->get('edit/(:segment)' , 'Users::edit/$1');
+    $routes->post('update/(:segment)' , 'Users::update/$1');
+    $routes->post('deactive/(:segment)' , 'Users::deActive/$1');
+});

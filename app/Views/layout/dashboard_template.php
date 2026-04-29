@@ -21,11 +21,18 @@ $menus = [
         'active' => $currentPath === 'penjualan'
     ],
     [
-        'label' => 'Barang (Master)',
+        'label' => 'Products (Master)',
         'xmlns' => 'http://www.w3.org/2000/svg',
         'd' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-        'link' => base_url('/barang'),
+        'link' => base_url('/products'),
         'active' => 'barang'
+    ],
+    [
+        'label' => 'Users (Master)',
+        'xmlns' => 'http://www.w3.org/2000/svg',
+        'd' => 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z',
+        'link' => base_url('/users'),
+        'active' => 'users'
     ]
 ]
 
@@ -100,7 +107,7 @@ $menus = [
         </main>
 
         <footer class="border-t border-zinc-800 px-4 md:px-8 py-4 text-center md:text-left">
-            <p class="text-zinc-600 text-xs">&copy; 2026 AmbaToys Admin. Hobby shop dashboard.</p>
+            <p class="text-zinc-600 text-xs">&copy; <?= date('Y') ?> Toko Arya dashboard.</p>
         </footer>
     </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -35,9 +35,8 @@
             </label>
 
             <label class="form-control w-full">
-                <div class="label flex items-center justify-between">
+                <div class="label flex items-center justify-between mt-5">
                     <span class="label-text text-zinc-300 text-sm">Password</span>
-                    <a href="#" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Lupa password?</a>
                 </div>
                 <input
                     name="password"
@@ -49,15 +48,7 @@
                 />
             </label>
 
-            <div class="flex items-center justify-between pt-1">
-                <label class="label cursor-pointer gap-2 p-0">
-                    <input type="checkbox" class="checkbox checkbox-sm border-zinc-600 [--chkbg:theme(colors.blue.600)] [--chkfg:white]" name="remember" />
-                    <span class="label-text text-zinc-400 text-sm">Remember me</span>
-                </label>
-                <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500">Secure login</span>
-            </div>
-
-            <button type="submit" class="btn w-full bg-blue-600 hover:bg-blue-500 border-0 text-white font-black tracking-wider uppercase">
+            <button type="submit" class="btn w-full bg-blue-600 hover:bg-blue-500 border-0 text-white font-black tracking-wider uppercase mt-10">
                 Masuk
             </button>
 

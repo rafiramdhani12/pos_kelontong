@@ -2,13 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Models\Products;
+use App\Models\ProductsModel;
 
-class Barang extends BaseController
+class Products extends BaseController
 {
     public function index()
     {
-        $productsModel = new Products();
+        $productsModel = new ProductsModel();
         return view('pages/products/products', [
             'title'        => 'Master Barang',
             'page_heading' => 'Daftar barang',
@@ -51,7 +51,7 @@ class Barang extends BaseController
                 'qty'          => (int) $qtys[$i],
                 'harga'        => (float) $hargas[$i],
                 'is_active'    => 1,
-                'image'        => $imageName, // null kalau nggak ada gambar
+                'image'        => $imageName,
             ];
         }
 
@@ -64,7 +64,7 @@ class Barang extends BaseController
 
     public function updateStock()
     {
-        $productsModel = new Products();
+        $productsModel = new ProductsModel();
         $id   = $this->request->getPost('id');
 
         $data = [
@@ -90,7 +90,7 @@ class Barang extends BaseController
 
     public function nonActiveStock()
     {
-        $productsModel = new Products();
+        $productsModel = new ProductsModel();
         $id = $this->request->getPost('id');
         $productsModel->update($id, ['is_active' => 0]);
         return redirect()->to(site_url('dashboard'));

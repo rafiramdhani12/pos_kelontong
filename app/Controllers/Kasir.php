@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\DetailTransaksi;
-use App\Models\Products;
+use App\Models\ProductsModel;
 use App\Models\Transaksi;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -11,7 +11,7 @@ class Kasir extends BaseController
 {
     public function index(): string
     {
-        $productsModel = new Products();
+        $productsModel = new ProductsModel();
         $keyword = trim((string) $this->request->getGet('q'));
 
         $builder = $productsModel
@@ -41,7 +41,7 @@ class Kasir extends BaseController
   public function penjualan(){
     $transaksiModel = new Transaksi();
     $detailTransaksiModel = new DetailTransaksi();
-    $productsModel = new Products();
+    $productsModel = new ProductsModel();
 
     $transaksi = $transaksiModel->select('id, total, created_at')->findAll();
 
@@ -128,7 +128,7 @@ class Kasir extends BaseController
             $qty = 1;
         }
 
-        $product = (new Products())->find($id);
+        $product = (new ProductsModel())->find($id);
         if (!$product) {
             return $this->response->setJSON(['ok' => false, 'message' => 'Produk tidak ditemukan']);
         }
@@ -178,7 +178,7 @@ class Kasir extends BaseController
         }
 
         $db = db_connect();
-        $productModel = new Products();
+        $productModel = new ProductsModel();
         $transaksiModel = new Transaksi();
         $detailModel = new DetailTransaksi();
 
@@ -260,7 +260,7 @@ class Kasir extends BaseController
         try {
             $transaksiModel = new Transaksi();
             $detailTransaksiModel = new DetailTransaksi();
-            $productsModel = new Products();
+            $productsModel = new ProductsModel();
             $transactions = $transaksiModel->select('id, total, created_at')->findAll();
             $items = $detailTransaksiModel->select('transaksi_id, product_id, qty, subtotal')->findAll();
             $products = $productsModel
