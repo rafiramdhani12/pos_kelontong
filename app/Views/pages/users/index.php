@@ -20,6 +20,7 @@
                 <th>#</th>
                 <th>Nama</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Status</th>
                 <th class="text-right">Aksi</th>
             </tr>
@@ -38,6 +39,10 @@
                     <?= esc($user['email']) ?>
                 </td>
 
+                <td class="text-zinc-400">
+                    <?= esc($user['role']) ?>
+                </td>
+
                 <td>
                     <?php if ($user['is_active']) : ?>
                         <span class="badge badge-success badge-sm">Active</span>
@@ -54,12 +59,17 @@
                            class="btn btn-xs btn-ghost text-blue-400">
                            Edit
                         </a>
-
                         <!-- Deactivate -->
                         <?php if ($user['is_active']) : ?>
                         <form action="<?= base_url('/users/deactive/' . $user['id']) ?>" method="post">
                             <button class="btn btn-xs btn-warning text-black">
                                 Deactive
+                            </button>
+                        </form>
+                        <?php else: ?>
+                        <form action="<?= base_url('/users/active/' . $user['id']) ?>" method="post">
+                            <button class="btn btn-xs btn-success text-black">
+                                Active
                             </button>
                         </form>
                         <?php endif; ?>

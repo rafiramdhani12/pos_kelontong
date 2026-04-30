@@ -226,7 +226,6 @@ async function inputJumlah(productId, namaProduct, stokTersedia) {
         showCancelButton: true,
         confirmButtonText: "Tambah",
         cancelButtonText: "Batal",
-        inputValue:1,
         inputAttributes: {
             min:1,
             max:stokTersedia,

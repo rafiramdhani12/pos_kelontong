@@ -54,6 +54,11 @@ class Products extends Migration
             ],
             'created_at' => [
                 'type' => 'timestamp',
+                'null' => false,
+            ],
+            'updated_at' => [
+                'type' => 'timestamp',
+                'null' => false,
             ],
         ]);
 

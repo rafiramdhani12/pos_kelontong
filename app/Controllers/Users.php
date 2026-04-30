@@ -26,17 +26,18 @@ class Users extends BaseController
     public function store()
     {
         $data = [
-            'name'     => $this->request->getPost('name'),
+            'nama'     => $this->request->getPost('nama'),
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'role' => $this->request->getPost('role'),
             'is_active' => 1
         ];
 
         // simple validation
         if (!$this->validate([
-            'name' => 'required',
+            'nama' => 'required',
             'email' => 'required|valid_email',
-            'password' => 'required|min_length[6]'
+            'password' => 'required|min_length[6]',
         ])) {
             return redirect()->back()->withInput();
         }
@@ -59,7 +60,7 @@ class Users extends BaseController
     public function update($id)
     {
         $data = [
-            'name'  => $this->request->getPost('name'),
+            'nama'  => $this->request->getPost('nama'),
             'email' => $this->request->getPost('email'),
         ];
 
@@ -91,4 +92,23 @@ class Users extends BaseController
 
     return redirect()->to('/users')->with('success', 'User berhasil dinonaktifkan');
 }
+
+    public function active($id)
+    {
+        $user = $this->users->find($id);
+
+        if(!$user){
+            return redirect()->to('/users')->with('error', 'User tidak ditemukan');
+        }
+
+        $updated = $this->users->update($id, [
+            'is_active' => 1
+        ]);
+
+        if (!$updated) {
+            return redirect()->to('/users')->with('error', 'Gagal mengaktifkan user');
+        }
+
+        return redirect()->to('/users')->with('success', 'User berhasil diaktifkan');
+    }
 }

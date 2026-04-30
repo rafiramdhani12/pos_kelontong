@@ -6,6 +6,10 @@ $filterType = $filter_type ?? 'harian';
 $tanggal = $tanggal ?? '';
 $minggu = $minggu ?? '';
 $bulan = $bulan ?? '';
+$totalPendapatanFilter = 0;
+foreach($transaction as $t){
+    $totalPendapatanFilter += $t['total'];
+}
 ?>
 <div class="p-6 bg-zinc-900 min-h-screen text-white">
     <div class="flex justify-between items-center mb-6">
@@ -16,7 +20,7 @@ $bulan = $bulan ?? '';
         <button class="btn btn-outline btn-primary btn-sm">Download PDF (coming soon)</button>
     </div>
 
-    <form method="get" action="<?= base_url('/penjualan') ?>" class="mb-6 bg-zinc-800 rounded-xl border border-zinc-700 p-4">
+    <form method="get" action="<?= base_url('/kasir/penjualan') ?>" class="mb-6 bg-zinc-800 rounded-xl border border-zinc-700 p-4">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
             <div class="md:col-span-2">
                 <label class="text-xs uppercase tracking-wider text-zinc-400 font-bold">Jenis Filter</label>
@@ -44,7 +48,15 @@ $bulan = $bulan ?? '';
 
             <div class="md:col-span-2 flex gap-2">
                 <button type="submit" class="btn btn-primary btn-sm">Terapkan</button>
-                <a href="<?= base_url('/penjualan') ?>" class="btn btn-ghost btn-sm">Reset</a>
+                <a href="<?= base_url('/kasir/penjualan') ?>" class="btn btn-ghost btn-sm">Reset</a>
+                <?php if (!empty($transaction)): ?>
+    <div class="ml-auto md:ml-0 pl-4 border-l border-zinc-700">
+        <p class="text-[10px] uppercase text-zinc-500 font-bold leading-none mb-1">Total Terfilter</p>
+        <p class="text-sm font-black text-success leading-none">
+            Rp <?= number_format($totalPendapatanFilter, 0, ',', '.') ?>
+        </p>
+    </div>
+    <?php endif; ?>
             </div>
         </div>
     </form>
@@ -75,6 +87,11 @@ $bulan = $bulan ?? '';
                                 <button onclick="document.getElementById('modal_detail_<?= $t['id'] ?>').showModal()" class="btn btn-ghost btn-sm text-info hover:bg-info/10">
                                     Detail
                                 </button>
+                                <form action="<?= base_url('/kasir/rollback/' . $t['id']) ?>" method="post" onsubmit="return confirm('Yakin mau batalin transaksi ini? Stok bakal balik otomatis lho.');">
+                                    <button type="submit" class="btn btn-ghost btn-sm text-error hover:bg-error/10">
+                                        Batalkan
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>

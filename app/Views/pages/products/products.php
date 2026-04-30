@@ -59,6 +59,23 @@
                                 Edit
                             </button>
                         </td>
+                        <td class="text-center">
+                            <?php if ($p['is_active'] == 1): ?>
+                                <form action="<?= base_url('products/toggleStock/' . $p['id']) ?>" method="post">
+                                    <button type="submit" class="btn btn-xs btn-success gap-2">
+                                        <div class="badge badge-white badge-xs"></div> 
+                                        Aktif
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <form action="<?= base_url('products/toggleStock/' . $p['id']) ?>" method="post">
+                                    <button type="submit" class="btn btn-xs btn-error btn-outline gap-2">
+                                        <div class="badge badge-error badge-xs"></div> 
+                                        Non-Aktif
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                       </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -78,12 +95,12 @@
             </div>
             <label for="modal-update" class="btn btn-ghost btn-sm btn-circle text-zinc-500">✕</label>
         </div>
-        <form action="<?= base_url('barang/updateStock') ?>" method="post" class="space-y-4" enctype="multipart/form-data">
+        <form action="<?= base_url('products/updateStock') ?>" method="post" class="space-y-4" enctype="multipart/form-data">
             <?= csrf_field() ?>
             <input type="hidden" name="id" id="edit-id">
             <div class="form-control">
                 <label class="label pb-1"><span class="label-text text-zinc-400 text-xs uppercase tracking-wider">Nama Produk</span></label>
-                <input type="text" id="edit-nama" class="input input-bordered input-sm bg-zinc-800 border-zinc-700 text-zinc-400 cursor-not-allowed" disabled />
+                <input type="text" name="nama_product" id="edit-nama" class="input input-bordered input-sm bg-zinc-800 border-zinc-700 text-zinc-400 cursor-not-allowed" readonly />
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="form-control">
@@ -135,7 +152,7 @@
             <label for="modal-batch" class="btn btn-ghost btn-sm btn-circle text-zinc-500">✕</label>
         </div>
 
-        <form action="<?= base_url('barang/tambahProduct') ?>" method="post" id="form-batch" enctype="multipart/form-data">
+        <form action="<?= base_url('products/tambahProduct') ?>" method="post" id="form-batch" enctype="multipart/form-data">
             <?= csrf_field() ?>
 
             <!-- Table header — 13 cols: 2+3+2+1+2+2+1 -->
@@ -173,11 +190,7 @@
 </div>
 
 <script>
-// ============================================================
-// BATCH INPUT
-// ============================================================
-
-function buatRow() {
+    function buatRow() {
     const div = document.createElement('div');
     div.className = 'batch-row grid gap-2 items-start bg-zinc-800/50 rounded-lg p-2';
     div.style.gridTemplateColumns = '2fr 3fr 2fr 1fr 2fr 2fr 0.5fr';
@@ -313,6 +326,7 @@ document.getElementById('modal-batch').addEventListener('change', function () {
 // ============================================================
 
 function editBarang(data) {
+    console.log(data)
     document.getElementById('edit-id').value    = data.id;
     document.getElementById('edit-nama').value  = data.nama_product;
     document.getElementById('edit-qty').value   = data.qty;
@@ -351,6 +365,25 @@ function clearEditImage() {
     document.getElementById('edit-image-input').value = '';
     document.getElementById('edit-image-thumb').src   = '';
     document.getElementById('edit-image-preview').classList.add('hidden');
+}
+
+async function konfirmasiNonActive(id, nama) {
+    const result = await Swal.fire({
+        title: 'Nonaktifkan produk?',
+        html: `<span class="text-zinc-400">Produk <strong class="text-white">${nama}</strong> tidak akan muncul di kasir.</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, nonaktifkan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#ef4444',
+        background: '#18181b',
+        color: '#fff',
+    });
+
+    if (result.isConfirmed) {
+        document.getElementById('nonactive-id').value = id;
+        document.getElementById('form-nonactive').submit();
+    }
 }
 </script>
 
