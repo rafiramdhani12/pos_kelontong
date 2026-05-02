@@ -20,48 +20,41 @@ class DashboardModel extends Model
      *
      * @return array{total_produk:int, total_stok:int, total_nilai_inventori:float, produk_baru:int, produk_bekas:int}
      */
-    public function getOverviewStats(): array
-    {
-        $db = $this->db;
+   public function getOverviewStats(): array
+{
+    $db = $this->db;
 
-        $totalProduk = (int) $this->countAll();
+    // 1. Total Produk (Hanya yang Aktif)
+    $totalProduk = (int) $this->where('is_active', 1)->countAllResults();
 
-        $stokRow = $db->table('products')
-            ->selectSum('qty', 'total_stok')
-            ->get()
-            ->getRowArray();
-        $totalStok = (int) ($stokRow['total_stok'] ?? 0);
+    // 2. Total Stok (Hanya dari Produk yang Aktif)
+    $stokRow = $db->table('products')
+        ->selectSum('qty', 'total_stok')
+        ->where('is_active', 1) // Filter barang aktif
+        ->get()
+        ->getRowArray();
+    $totalStok = (int) ($stokRow['total_stok'] ?? 0);
 
-        $nilaiRow = $db->query(
-            'SELECT COALESCE(SUM(harga * qty), 0) AS total_nilai FROM products'
-        )->getRowArray();
-        $totalNilai = (float) ($nilaiRow['total_nilai'] ?? 0);
+    // 3. Total Nilai Inventori (Hanya dari Produk yang Aktif)
+    $nilaiRow = $db->table('products')
+        ->select('SUM(harga * qty) AS total_nilai')
+        ->where('is_active', 1) // Filter barang aktif
+        ->get()
+        ->getRowArray();
+    $totalNilai = (float) ($nilaiRow['total_nilai'] ?? 0);
 
-        // $kondisi = $db->table('products')
-        //     ->select('kondisi, COUNT(*) AS c')
-        //     ->groupBy('kondisi')
-        //     ->get()
-        //     ->getResultArray();
+    $nilaiNonAktif = $db->table('products')->selectSum('qty' , 'total')->where('is_active', 0)->get()->getRowArray();
+    $barangNonActive = $db->table('products')->select('nama_product , qty')->where('is_active', 0)->get()->getResultArray();
+    
 
-        // $baru = 0;
-        // $bekas = 0;
-        // foreach ($kondisi as $row) {
-        //     if (($row['kondisi'] ?? '') === 'new') {
-        //         $baru = (int) $row['c'];
-        //     }
-        //     if (($row['kondisi'] ?? '') === 'used') {
-        //         $bekas = (int) $row['c'];
-        //     }
-        // }
-
-        return [
-            'total_produk'           => $totalProduk,
-            'total_stok'             => $totalStok,
-            'total_nilai_inventori' => $totalNilai,
-            // 'produk_baru'            => $baru,
-            // 'produk_bekas'           => $bekas,
-        ];
-    }
+    return [
+        'total_produk'           => $totalProduk,
+        'total_stok'             => $totalStok,
+        'total_nilai_inventori'  => $totalNilai,
+        'nilai_non_aktif'        => (int) ($nilaiNonAktif['total'] ?? 0),
+        'barang_non_aktif'       => $barangNonActive
+    ];
+}
 
     /**
      * Jumlah SKU per kategori (untuk chart / tabel ringkas).

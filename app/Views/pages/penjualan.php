@@ -87,8 +87,8 @@ foreach($transaction as $t){
                                 <button onclick="document.getElementById('modal_detail_<?= $t['id'] ?>').showModal()" class="btn btn-ghost btn-sm text-info hover:bg-info/10">
                                     Detail
                                 </button>
-                                <form action="<?= base_url('/kasir/rollback/' . $t['id']) ?>" method="post" onsubmit="return confirm('Yakin mau batalin transaksi ini? Stok bakal balik otomatis lho.');">
-                                    <button type="submit" class="btn btn-ghost btn-sm text-error hover:bg-error/10">
+                                <form action="<?= base_url('/kasir/rollback/' . $t['id']) ?>" method="post">
+                                    <button type="button" class="btn btn-ghost btn-sm text-error hover:bg-error/10" onclick="confirmRollback(<?= $t['id'] ?>)">
                                         Batalkan
                                     </button>
                                 </form>
@@ -173,6 +173,25 @@ foreach($transaction as $t){
         filterSelect.addEventListener('change', toggleInputs);
         toggleInputs();
     });
+
+    const confirmRollback = (id) => {
+        Swal.fire({
+            title: 'Batalkan transaksi?',
+            text: 'Transaksi akan dibatalkan dan tidak dapat dikembalikan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, batalkan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#ef4444',
+            background: '#18181b',
+            color: '#fff',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`form-rollback-${id}`).submit()
+            }
+        });
+    }
 </script>
 
 <?= $this->endSection(); ?>

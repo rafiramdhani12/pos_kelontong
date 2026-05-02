@@ -47,17 +47,28 @@ $out_of_stock = $out_of_stock ?? [];
     </div>
 
    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden group hover:border-green-500/50 transition-all">
-    <div class="relative z-10">
-        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-3">Omzet Hari Ini</p>
-        <p class="text-2xl font-black text-green-400 tracking-tighter">
-            Rp <?= number_format((float) ($daily_omzet ?? 0), 0, ',', '.') ?>
-        </p>
-        <p class="text-xs text-zinc-500 mt-3 italic">Total Penjualan Real-time</p>
+        <div class="relative z-10">
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-3">total Omzet</p>
+            <p class="text-2xl font-black text-green-400 tracking-tighter">
+                Rp <?= number_format((float) ($daily_omzet ?? 0), 0, ',', '.') ?>
+            </p>
+            <p class="text-xs text-zinc-500 mt-3 italic">Total Penjualan Real-time</p>
+        </div>
+        <svg class="absolute -right-4 -bottom-4 h-24 w-24 text-zinc-800/50 group-hover:text-green-500/10 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+        </svg>
     </div>
-    <svg class="absolute -right-4 -bottom-4 h-24 w-24 text-zinc-800/50 group-hover:text-green-500/10 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
-    </svg>
-</div>
+   <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden group hover:border-green-500/50 transition-all">
+        <div class="relative z-10">
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-3">barang non aktif</p>
+            <p class="text-2xl font-black text-green-400 tracking-tighter">
+             <?= $stats['nilai_non_aktif'] ?? 0 ?>
+            </p>
+        </div>
+        <svg class="absolute -right-4 -bottom-4 h-24 w-24 text-zinc-800/50 group-hover:text-green-500/10 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+        </svg>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -82,6 +93,20 @@ $out_of_stock = $out_of_stock ?? [];
                     <?php endforeach; ?>
                 <?php endif; ?>
             </ul>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="px-6 py-4 border-b border-zinc-800 bg-zinc-950/50 flex items-center justify-between">
+                <h2 class="font-black text-xs uppercase tracking-widest text-white">Barang non aktif</h2>
+                <div class="h-2 w-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(37,99,235,0.6)]"></div>
+            </div>
+            <div class="divide-y divide-zinc-800/50">
+               <?php if ($stats['nilai_non_aktif'] === 0):?>
+                    <p class="px-6 py-10 text-center text-zinc-600 text-sm italic">semua stock ready on display</p>
+                <?endif;?>
+                <div class="px-6 py-3.5 text-sm font-semibold text-zinc-300">
+                    <h1><?= $stats['nilai_non_aktif'] ?? 0 ?> pcs</h1>
+                </div>
+            </div>
         </div>
 
         <?php if ($out_of_stock !== []): ?>
