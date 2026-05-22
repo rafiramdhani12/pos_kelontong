@@ -40,7 +40,7 @@
                 </td>
 
                 <td class="text-zinc-400">
-                    <?= esc($user['role']) ?>
+                    <?= esc($user['role'] == 'admin' ? 'kasir' : 'owner') ?>
                 </td>
 
                 <td>

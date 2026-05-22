@@ -61,19 +61,21 @@ $menus = [
                 <?php foreach ($menus as $menu) : ?>
 
                     <?php
-                        $isOwnerMenu = ($menu['label'] === 'Barang (Master)') ;
-                        $isNotOwner = (session()->get('user_role') !== 'owner') ;
-                        if($isOwnerMenu && $isNotOwner) continue;
+
+                    $isOwnerMenu = ($menu['label'] === 'Products (Master)') || ($menu['label'] === 'Users (Master)');
+                    $isNotOwner  = (session()->get('user_role') !== 'owner');
+                    
+                    if($isOwnerMenu && $isNotOwner) continue;
                     ?>
 
-                <a href="<?= $menu['link'] ?>"
-                  class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold 
-   <?= ($currentPath === "kasir") ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="<?= $menu['d'] ?>" />
-                    </svg>
-                    <?= $menu['label'] ?>
-                </a>
+                        <a href="<?= $menu['link'] ?>"
+                        class="shrink-0 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold 
+                             <?= ($currentPath === "kasir") ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30' : 'text-zinc-300 hover:text-white border border-transparent hover:border-zinc-700' ?>">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="<?= $menu['d'] ?>" />
+                            </svg>
+                            <?= $menu['label'] ?>
+                        </a>
                 <?php endforeach?>
             </nav>
 

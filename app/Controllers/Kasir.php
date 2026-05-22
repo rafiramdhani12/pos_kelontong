@@ -111,7 +111,7 @@ class Kasir extends BaseController
     }
 
     return view('pages/penjualan', [
-        'title'       => 'Laporan Penjualan — AmbaToys',
+        'title'       => 'Laporan Penjualan',
         'transaction' => $transaksi,
         'filter_type' => $filterType,
         'tanggal'     => $tanggal,
@@ -284,6 +284,7 @@ public function rollBack($id)
 
     return redirect()->to('/kasir/penjualan')->with('message', 'Transaksi #TX-' . $id . ' berhasil dibatalkan dan stok telah kembali.');
 }
+// refactor pindahin method ini ke dashboard
     public function getDataFromFlask(){
         try {
             $transaksiModel = new Transaksi();

@@ -26,9 +26,12 @@ $routes->group('dashboard' ,static function ($routes){
 
 $routes->group('products', static function ($routes) {
     $routes->get('/', 'Products::index', ['filter' => 'auth']);
-    $routes->post('tambahProduct', 'Products::tambahProduct', ['filter' => 'auth']);
-    $routes->post('updateStock', 'Products::updateStock', ['filter' => 'auth']);
-    $routes->post('toggleStock/(:segment)', 'Products::toggleStock/$1', ['filter' => 'auth']);
+    $routes->get('add', 'Products::add', ['filter' => 'auth']);
+    $routes->post('store', 'Products::store', ['filter' => 'auth']);
+    $routes->get('edit/(:segment)', 'Products::edit/$1', ['filter' => 'auth']);
+    $routes->post('update/(:segment)', 'Products::update/$1', ['filter' => 'auth']);
+    $routes->post('toggleStatus/(:segment)', 'Products::toggleStatus/$1', ['filter' => 'auth']);
+    $routes->post('delete/(:segment)', 'Products::delete/$1', ['filter' => 'auth']);
 });
 
 $routes->group('users', static function ($routes) {
@@ -37,6 +40,5 @@ $routes->group('users', static function ($routes) {
     $routes->post('store' , 'Users::store');
     $routes->get('edit/(:segment)' , 'Users::edit/$1');
     $routes->post('update/(:segment)' , 'Users::update/$1');
-    $routes->post('deactive/(:segment)' , 'Users::deActive/$1');
-    $routes->post('active/(:segment)' , 'Users::active/$1');
+    $routes->post('toggleStatus/(:segment)' , 'Users::toggleStatus/$1');
 });

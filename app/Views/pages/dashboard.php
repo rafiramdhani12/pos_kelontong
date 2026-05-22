@@ -104,7 +104,7 @@ $out_of_stock = $out_of_stock ?? [];
                     <p class="px-6 py-10 text-center text-zinc-600 text-sm italic">semua stock ready on display</p>
                 <?endif;?>
                 <div class="px-6 py-3.5 text-sm font-semibold text-zinc-300">
-                    <h1><?= $stats['nilai_non_aktif'] ?? 0 ?> pcs</h1>
+                    <h1><?= $stats['nilai_non_aktif'] ?? 0 ?> SKU</h1>
                 </div>
             </div>
         </div>

@@ -6,16 +6,16 @@ use App\Models\UsersModel;
 
 class Users extends BaseController
 {
-    protected $users;
+    protected $usersModel;
 
     public function __construct()
     {
-        $this->users = new UsersModel();
+        $this->usersModel = new UsersModel();
     }
 
     public function index()
     {
-        $data['users'] = $this->users->findAll();
+        $data['users'] = $this->usersModel->findAll();
         return view('pages/users/index', $data);
     }
 
@@ -42,14 +42,14 @@ class Users extends BaseController
             return redirect()->back()->withInput();
         }
 
-        $this->users->insert($data);
+        $this->usersModel->insert($data);
 
         return redirect()->to('/users')->with('success', 'User berhasil ditambahkan');
     }
 
     public function edit($id)
     {
-        $data['user'] = $this->users->find($id);
+        $data['user'] = $this->usersModel->find($id);
 
         if (!$data['user']) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('User tidak ditemukan');
@@ -69,46 +69,22 @@ class Users extends BaseController
             $data['password'] = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
         }
 
-        $this->users->update($id, $data);
+        $this->usersModel->update($id, $data);
 
         return redirect()->to('/users')->with('success', 'User berhasil diupdate');
     }
 
-    public function deActive($id)
-{
-    $user = $this->users->find($id);
+    // refactor fitur nya jadi 1 aja toggle status
 
-    if (!$user) {
-        return redirect()->to('/users')->with('error', 'User tidak ditemukan');
-    }
+    public function toggleStatus($id){
+        $user = $this->usersModel->find($id);
+        if($status){
+            $newStatus = ($user['is_active'] == 1) ? 0 : 1;
+            $this->userModel->where('id', $id)
+                           ->set(['is_active' => $newStatus])
+                           ->update();
 
-    $updated = $this->users->update($id, [
-        'is_active' => 0
-    ]);
-
-    if (!$updated) {
-        return redirect()->to('/users')->with('error', 'Gagal menonaktifkan user');
-    }
-
-    return redirect()->to('/users')->with('success', 'User berhasil dinonaktifkan');
-}
-
-    public function active($id)
-    {
-        $user = $this->users->find($id);
-
-        if(!$user){
-            return redirect()->to('/users')->with('error', 'User tidak ditemukan');
+            return redirect()->to('/users')->with('msg', 'Status user berhasil diubah!');
         }
-
-        $updated = $this->users->update($id, [
-            'is_active' => 1
-        ]);
-
-        if (!$updated) {
-            return redirect()->to('/users')->with('error', 'Gagal mengaktifkan user');
-        }
-
-        return redirect()->to('/users')->with('success', 'User berhasil diaktifkan');
     }
 }

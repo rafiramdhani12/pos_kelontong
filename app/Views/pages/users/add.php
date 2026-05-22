@@ -63,7 +63,7 @@
                 <select name="role"
                     class="select select-bordered w-full bg-zinc-950 border-zinc-700 focus:border-blue-500">
                     <option value="owner">Owner</option>
-                    <option value="admin" selected>Admin</option>
+                    <option value="admin" selected>Kasir</option>
                 </select>
             </div>
 

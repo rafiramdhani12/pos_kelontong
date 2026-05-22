@@ -22,7 +22,11 @@ class Products extends BaseController
         ]);
     }
 
-    public function tambahProduct()
+    public function add(){
+        return view('pages/products/add');
+    }
+
+    public function store()
     {
         $kodes    = $this->request->getPost('kode_product');
         $namas    = $this->request->getPost('nama_product');
@@ -35,8 +39,17 @@ class Products extends BaseController
 
         $data  = [];
 
+        if(count($kodes) !== count(array_unique($kodes))) {
+            return redirect()->back()->withInput()->with('error', 'Kode barang tidak boleh sama');
+        }
+
         foreach ($kodes as $i => $kode) {
-            if (empty(trim($kode))) continue;
+            $kodeTrim = trim($kode);
+
+            $checkDB = $this->productsModel->where('kode_product', $kodeTrim)->first();
+        if ($checkDB) {
+            return redirect()->back()->withInput()->with('error', "Kode '$kodeTrim' sudah dipakai barang lain!");
+        }
 
             $imageName = null;
 
@@ -64,10 +77,16 @@ class Products extends BaseController
         return redirect()->to('/products')->with('success', count($data) . ' produk berhasil ditambahkan.');
     }
 
-    public function updateStock()
-    {
-        $id = $this->request->getPost('id');
+    public function edit($id){
+        $data['product'] = $this->productsModel->find($id);
+        if(!$data['product']){
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Produk tidak ditemukan');
+        }
+        return view('pages/products/edit', $data);
+    }
 
+    public function update($id)
+    {
         $data = [
             'nama_product' => $this->request->getPost('nama_product'),
             'qty'          => $this->request->getPost('qty'),
@@ -87,7 +106,8 @@ class Products extends BaseController
         return redirect()->to('/products')->with('success', 'Barang berhasil diupdate');
     }
 
-   public function toggleStock($id)
+    // ganti nama jadi toggleStatus
+   public function toggleStatus($id)
 {
     $product = $this->productsModel->find($id);
     if ($product) {
@@ -101,4 +121,9 @@ class Products extends BaseController
     
     return redirect()->to('/products')->with('error', 'Produk tidak ditemukan');
 }
+
+    public function delete($id){
+        $this->productsModel->delete($id);
+        return redirect()->to('/products')->with('success', 'Produk berhasil dihapus');
+    }
 }
