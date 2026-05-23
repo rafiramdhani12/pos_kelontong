@@ -12,7 +12,7 @@ class Users extends Seeder
             'nama' => "arya",
             "email" => "arya@gmail.com",
             "password" => password_hash("arya123", PASSWORD_DEFAULT),
-            "role" => "admin",
+            "role" => "owner",
             "is_active" => 1,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),

@@ -22,80 +22,237 @@
     <!-- Tabel Produk -->
     <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="table w-full">
-                <thead class="bg-zinc-950 text-zinc-500 uppercase text-[10px] tracking-wider">
-                    <tr>
-                        <th class="py-4 pl-5">Kode</th>
-                        <th>Nama Produk</th>
-                        <th>Kategori</th>
-                        <th>Stok</th>
-                        <th>Harga</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                    <?php foreach ($products as $p): ?>
-                    <tr class="hover:bg-zinc-800/40 transition-colors border-zinc-800">
-                        <td class="pl-5 font-mono text-blue-400 text-xs font-bold"><?= esc($p['kode_product']) ?></td>
-                        <td class="font-semibold text-zinc-200"><?= esc($p['nama_product']) ?></td>
-                        <td>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full border border-zinc-700 text-zinc-400 uppercase tracking-wider">
-                                <?= esc($p['kategori']) ?>
-                            </span>
-                        </td>
-                        <td class="<?= (int)$p['qty'] <= 5 ? 'text-amber-400 font-bold' : 'text-zinc-300' ?>">
-                            <?= (int)$p['qty'] ?> unit
-                            <?php if ((int)$p['qty'] <= 5): ?>
-                                <span class="text-[9px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded ml-1">LOW</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="font-black text-emerald-400">Rp <?= number_format((float)$p['harga'], 0, ',', '.') ?></td>
-                        <td class="text-center pr-5">
-                            <a
-                            href="<?= base_url('products/edit/' . $p['id']) ?>"
-                                class="btn btn-ghost btn-xs text-zinc-500 hover:text-white"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                </svg>
-                                Edit
-                            </a>
-                        </td>
-                        <?php if (session()->get('user_role') == 'owner'): ?>
-                        <td class="text-center pr-5">
-                            <form action="<?= base_url('products/delete/' . $p['id']) ?>" method="post">
-                                <button 
-                                type="submit"
-                                    class="btn btn-error btn-xs text-white hover:text-white">
-                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
-                        <?php endif; ?>
-                        <td class="text-center">
-                            <?php if ($p['is_active'] == 1): ?>
-                                <form action="<?= base_url('products/toggleStock/' . $p['id']) ?>" method="post">
-                                    <button type="submit" class="btn btn-xs btn-success gap-2">
-                                        <div class="badge badge-white badge-xs"></div> 
-                                        Aktif
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <form action="<?= base_url('products/toggleStock/' . $p['id']) ?>" method="post">
-                                    <button type="submit" class="btn btn-xs btn-error btn-outline gap-2">
-                                        <div class="badge badge-error badge-xs"></div> 
-                                        Non-Aktif
-                                    </button>
-                                </form>
-                            <?php endif; ?>
-                       </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+          <table class="table w-full min-w-[1000px]">
+
+<thead class="sticky top-0 bg-zinc-950 text-zinc-500 uppercase text-[10px] tracking-widest">
+
+<tr>
+    <th class="py-4 pl-5">Kode</th>
+    <th>Nama Produk</th>
+    <th>Kategori</th>
+    <th>Stok</th>
+    <th>Harga</th>
+    <th class="text-center">Aksi</th>
+</tr>
+
+</thead>
+
+<tbody class="text-sm">
+
+<?php foreach ($products as $p): ?>
+
+<tr class="hover:bg-zinc-800/40 transition border-zinc-800">
+
+<td class="pl-5">
+
+<div class="font-mono text-blue-400 text-xs font-bold">
+<?= esc($p['kode_product']) ?>
+</div>
+
+</td>
+
+
+<td>
+
+<div class="flex flex-col">
+
+<span class="font-semibold text-zinc-100">
+
+<?= esc($p['nama_product']) ?>
+
+</span>
+
+<span class="text-[10px] text-zinc-500">
+
+ID #<?= $p['id'] ?>
+
+</span>
+
+</div>
+
+</td>
+
+
+<td>
+
+<span class="
+inline-flex
+px-3
+py-1
+rounded-full
+text-[10px]
+uppercase
+tracking-wider
+border
+border-zinc-700
+bg-zinc-800/60
+text-zinc-300
+">
+
+<?= esc($p['kategori']) ?>
+
+</span>
+
+</td>
+
+
+
+<td>
+
+<div class="flex items-center gap-2">
+
+<span
+class="
+badge
+badge-sm
+
+<?= ((int)$p['qty']<=5)
+
+?'badge-warning'
+
+:'badge-neutral'
+
+?>
+
+"
+>
+
+<?= (int)$p['qty'] ?>
+
+</span>
+
+<?php if((int)$p['qty']<=5): ?>
+
+<span class="text-[10px] text-amber-400">
+
+Restock
+
+</span>
+
+<?php endif; ?>
+
+</div>
+
+</td>
+
+
+
+<td class="font-black text-emerald-400">
+
+Rp <?= number_format((float)$p['harga'],0,',','.') ?>
+
+</td>
+
+
+
+<td>
+
+<div class="flex flex-wrap justify-center gap-2">
+
+<!-- EDIT -->
+
+<a
+href="<?= base_url('products/edit/'.$p['id']) ?>"
+class="btn btn-xs btn-ghost hover:bg-zinc-800"
+>
+
+✏️ Edit
+
+</a>
+
+
+
+<!-- DELETE -->
+
+<?php if(session()->get('user_role')=='owner'): ?>
+
+<form
+action="<?= base_url('products/delete/'.$p['id']) ?>"
+method="post"
+>
+
+<?= csrf_field() ?>
+
+<button
+type="submit"
+class="btn btn-xs btn-error"
+>
+
+🗑
+
+</button>
+
+</form>
+
+<?php endif; ?>
+
+
+
+<!-- STATUS -->
+
+<form
+action="<?= base_url('products/toggleStatus/'.$p['id']) ?>"
+method="post"
+>
+
+<?= csrf_field() ?>
+
+<button
+type="submit"
+
+class="
+btn
+btn-xs
+
+<?=
+
+$p['is_active']
+
+?'btn-success'
+
+:'btn-outline btn-error'
+
+?>
+
+"
+
+>
+
+<?=
+
+$p['is_active']
+
+?'🟢'
+
+:'🔴'
+
+?>
+
+<?=
+
+$p['is_active']
+
+?'Aktif'
+
+:'Nonaktif'
+
+?>
+
+</button>
+
+</form>
+
+</div>
+
+</td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</tbody>
+
+</table>
         </div>
     </div>
 </div>

@@ -23,7 +23,7 @@ def forecast():
             items = payload.get('items', [])
             products = payload.get('products', [])
         else:
-            url = "http://localhost:8080/api/penjualan"
+            url = "http://web/api/penjualan"
             res = requests.get(url, timeout=10)
             data = res.json()
             transactions = data.get('transaction', [])
@@ -170,4 +170,4 @@ def forecast():
     })
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

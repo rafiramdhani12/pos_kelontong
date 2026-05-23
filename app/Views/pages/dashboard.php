@@ -102,7 +102,7 @@ $out_of_stock = $out_of_stock ?? [];
             <div class="divide-y divide-zinc-800/50">
                <?php if ($stats['nilai_non_aktif'] === 0):?>
                     <p class="px-6 py-10 text-center text-zinc-600 text-sm italic">semua stock ready on display</p>
-                <?endif;?>
+                <?php endif;?>
                 <div class="px-6 py-3.5 text-sm font-semibold text-zinc-300">
                     <h1><?= $stats['nilai_non_aktif'] ?? 0 ?> SKU</h1>
                 </div>

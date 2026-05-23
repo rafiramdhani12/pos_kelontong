@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\DetailTransaksi;
 use App\Models\ProductsModel;
 use App\Models\Transaksi;
+use App\Models\AuditTrailModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class Kasir extends BaseController
@@ -262,6 +263,7 @@ public function rollBack($id)
     $transaksiModel = new Transaksi();
     $detailModel = new DetailTransaksi();
     $productModel = new ProductsModel();
+    $auditModel = new AuditTrailModel();
 
     $db->transStart();
     $items = $detailModel->where('transaksi_id', $id)->findAll();
@@ -271,6 +273,11 @@ public function rollBack($id)
             $db->query("UPDATE products SET qty = qty + ? WHERE id = ?", [
                 $item['qty'], 
                 $item['product_id']
+            ]);
+            $auditModel->insert([
+                'detail_transaksi_id' => $item['id'],
+                'user_id' => session()->get('user_id'),
+                'nominal' => $item['subtotal']
             ]);
         }
     }
@@ -298,7 +305,7 @@ public function rollBack($id)
                 ->findAll();
 
             $client = \Config\Services::curlrequest();
-            $res = $client->post('http://127.0.0.1:5000/forecast',[
+            $res = $client->post('http://ai_service:5000/forecast',[
                 'timeout' => 10,
                 'http_errors' => false,
                 'json' => [

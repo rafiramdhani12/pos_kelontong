@@ -61,13 +61,13 @@
                         </a>
                         <!-- Deactivate -->
                         <?php if ($user['is_active']) : ?>
-                        <form action="<?= base_url('/users/deactive/' . $user['id']) ?>" method="post">
+                        <form action="<?= base_url('/users/toggleStatus/' . $user['id']) ?>" method="post">
                             <button class="btn btn-xs btn-warning text-black">
                                 Deactive
                             </button>
                         </form>
                         <?php else: ?>
-                        <form action="<?= base_url('/users/active/' . $user['id']) ?>" method="post">
+                        <form action="<?= base_url('/users/toggleStatus/' . $user['id']) ?>" method="post">
                             <button class="btn btn-xs btn-success text-black">
                                 Active
                             </button>

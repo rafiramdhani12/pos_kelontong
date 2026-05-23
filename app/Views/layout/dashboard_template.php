@@ -33,6 +33,12 @@ $menus = [
         'd' => 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z',
         'link' => base_url('/users'),
         'active' => 'users'
+    ],
+    [
+        'label' => 'Audit Trail',
+        'd' => 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
+        'link' => base_url('/audit-trail'),
+        'active' => 'audit-trail'
     ]
 ]
 
@@ -62,7 +68,7 @@ $menus = [
 
                     <?php
 
-                    $isOwnerMenu = ($menu['label'] === 'Products (Master)') || ($menu['label'] === 'Users (Master)');
+                    $isOwnerMenu = ($menu['label'] === 'Products (Master)') || ($menu['label'] === 'Users (Master)') || ($menu['label'] === 'Audit Trail');
                     $isNotOwner  = (session()->get('user_role') !== 'owner');
                     
                     if($isOwnerMenu && $isNotOwner) continue;

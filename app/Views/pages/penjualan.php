@@ -87,7 +87,7 @@ foreach($transaction as $t){
                                 <button onclick="document.getElementById('modal_detail_<?= $t['id'] ?>').showModal()" class="btn btn-ghost btn-sm text-info hover:bg-info/10">
                                     Detail
                                 </button>
-                                <form action="<?= base_url('/kasir/rollback/' . $t['id']) ?>" method="post">
+                                <form id="form-rollback-<?= $t['id'] ?>" action="<?= base_url('/kasir/rollback/' . $t['id']) ?>" method="post">
                                     <button type="button" class="btn btn-ghost btn-sm text-error hover:bg-error/10" onclick="confirmRollback(<?= $t['id'] ?>)">
                                         Batalkan
                                     </button>

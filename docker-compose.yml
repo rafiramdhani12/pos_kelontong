@@ -4,11 +4,15 @@ services:
     image: php:8.3-fpm
     volumes:
       - .:/app
+    networks:
+      - app-network
   db:
     image: mariadb:10.11
     environment:
       MYSQL_ROOT_PASSWORD: Karab412
       MYSQL_DATABASE: db_pos
+    networks:
+      - app-network
   web:
     image: nginx:alpine
     ports:
@@ -16,6 +20,8 @@ services:
     volumes:
       - .:/var/www/html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - app-network
   ai_service:
     build: 
       context: ./ml

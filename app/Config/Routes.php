@@ -19,6 +19,7 @@ $routes->group("kasir", static function ($routes) {
 });
 
 $routes->get('/api/penjualan', 'Kasir::penjualan');
+$routes->get('/audit-trail', 'AuditTrail::index', ['filter' => 'auth']);
 $routes->group('dashboard' ,static function ($routes){
     $routes->get('/', 'Dashboard::index');
     $routes->get('get-ai-data', 'Kasir::getDataFromFlask');
