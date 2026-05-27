@@ -1,4 +1,4 @@
-# AmbaToys - POS Kelontong & AI Insights
+# TokoArya - POS Kelontong & AI Insights
 
 Sistem Point of Sales (POS) modern yang dirancang untuk toko kelontong, dilengkapi dengan analisis data pintar menggunakan Machine Learning untuk prediksi omzet dan manajemen stok.
 
