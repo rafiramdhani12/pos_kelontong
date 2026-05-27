@@ -305,7 +305,7 @@ public function rollBack($id)
                 ->findAll();
 
             $client = \Config\Services::curlrequest();
-            $res = $client->post('http://ai_service:5000/forecast',[
+            $res = $client->post('http://127.0.0.1:5000/forecast',[
                 'timeout' => 10,
                 'http_errors' => false,
                 'json' => [
@@ -337,7 +337,7 @@ public function rollBack($id)
         } catch (\Exception $e) {
             return $this->response->setStatusCode(503)->setJSON([
                 "status" => "error",
-                "message" => "AI service offline",
+                "message" => "AI service offline: " . $e->getMessage(),
             ]);
         }
     }

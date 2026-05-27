@@ -120,4 +120,55 @@ class DashboardModel extends Model
 
     return (float) ($row['omzet'] ?? 0);
 }
+
+public function getDataFromFlask(){
+        try {
+            $transaksiModel = new Transaksi();
+            $detailTransaksiModel = new DetailTransaksi();
+            $productsModel = new ProductsModel();
+            $transactions = $transaksiModel->select('id, total, created_at')->findAll();
+            $items = $detailTransaksiModel->select('transaksi_id, product_id, qty, subtotal')->findAll();
+            $products = $productsModel
+                ->select('id, kode_product, nama_product, kategori, qty, harga, is_active')
+                ->where('is_active', 1)
+                ->findAll();
+
+            $client = \Config\Services::curlrequest();
+            $res = $client->post('http://127.0.0.1:5000/forecast',[
+                'timeout' => 10,
+                'http_errors' => false,
+                'json' => [
+                    'transaction' => $transactions,
+                    'items' => $items,
+                    'products' => $products,
+                ],
+            ]);
+
+            $statusCode = $res->getStatusCode();
+            $payload = json_decode($res->getBody(), true);
+
+            if (!is_array($payload)) {
+                return $this->response->setStatusCode(502)->setJSON([
+                    'status' => 'error',
+                    'message' => 'Respons AI service tidak valid',
+                ]);
+            }
+
+            if (($payload['status'] ?? null) !== 'success') {
+                return $this->response->setStatusCode($statusCode >= 400 ? $statusCode : 502)->setJSON([
+                    'status' => 'error',
+                    'message' => $payload['message'] ?? 'AI service mengembalikan error',
+                    'flask_http_code' => $statusCode,
+                ]);
+            }
+
+            return $this->response->setStatusCode(200)->setJSON($payload);
+        } catch (\Exception $e) {
+            log_message('error', 'Flask error: ' . $e->getMessage());
+    return $this->response->setStatusCode(503)->setJSON([
+        "status"  => "error",
+        "message" => "AI service offline: " . $e->getMessage(), // hapus setelah debug
+    ]);
+        }
+    }
 }

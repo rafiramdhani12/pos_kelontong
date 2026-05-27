@@ -18,7 +18,7 @@ class Products extends BaseController
         return view('pages/products/products', [
             'title'        => 'Master Barang',
             'page_heading' => 'Daftar barang',
-            'products'     => $this->productsModel->findAll(), // FIX
+            'products'     => $this->productsModel->findAll(), 
         ]);
     }
 
@@ -34,7 +34,7 @@ class Products extends BaseController
         $qtys     = $this->request->getPost('qty');
         $hargas   = $this->request->getPost('harga');
 
-        $files = $this->request->getFiles(); // FIX
+        $files = $this->request->getFiles(); //
         $images = $files['image'] ?? [];
 
         $data  = [];

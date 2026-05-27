@@ -30,7 +30,7 @@ class Auth extends BaseController
         if (empty($loginData['email']) || empty($loginData['password'])) {
             session()->setFlashdata('error', 'Email dan password wajib diisi.');
 
-            return redirect()->to('/login')->withInput();
+            return redirect()->to('/')->withInput();
         }
 
         $user = $authModel->login($loginData['email'], $loginData['password']);
@@ -49,7 +49,7 @@ class Auth extends BaseController
         }
 
         session()->setFlashdata('error', 'Email atau password salah, atau akun tidak aktif.');
-        return redirect()->to('/login')->withInput();
+        return redirect()->to('/')->withInput();
     }
 
     public function logout(): RedirectResponse

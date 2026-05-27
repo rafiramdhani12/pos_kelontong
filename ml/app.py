@@ -23,7 +23,7 @@ def forecast():
             items = payload.get('items', [])
             products = payload.get('products', [])
         else:
-            url = "http://web/api/penjualan"
+            url = "http://localhost:8080/api/penjualan"
             res = requests.get(url, timeout=10)
             data = res.json()
             transactions = data.get('transaction', [])
